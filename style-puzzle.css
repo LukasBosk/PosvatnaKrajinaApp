@@ -116,13 +116,15 @@ button:disabled {
     transform: translate(-50%, -50%);
 }
 
-.puzzle-piece.highlight { /* NOVÁ TŘÍDA PRO ZVÝRAZNĚNÍ */
-    border: 2px dashed #007bff; /* Modrý tečkovaný rámeček */
+.puzzle-piece.highlight {
+    border: 2px dashed #007bff;
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
+/* ZMĚNA ZDE: Odstraněna zelená mřížka, vrácen jemný rámeček */
 .puzzle-piece.correct {
-    border: 2px solid green;
+    border: 1px solid #eee; /* Vrátí se k původnímu, jemnému rámečku */
+    /* Pokud chcete úplně odstranit rámečky, použijte: border: none; */
 }
 
 #message {
