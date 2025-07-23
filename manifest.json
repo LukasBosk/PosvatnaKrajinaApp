@@ -1,6 +1,6 @@
 {
-  "name": "Muzeum Boskovicka 3D",
-  "short_name": "Muzeum 3D",
+  "name": "Muzeum regionu Boskovicka",
+  "short_name": "Muzeum Boskovice",
   "description": "3D prohlížeč objektů Muzea regionu Boskovicka s podporou AR",
   "start_url": "./index.html",
   "display": "standalone",
