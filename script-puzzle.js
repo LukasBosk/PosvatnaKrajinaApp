@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const puzzleMessages = {
         'images/puzzle1.jpg': 'Bronzová sekera s tulejí a ouškem, délka 11,2 cm. Kultura lužických popelnicových polí.',
-        'images/puzzle2.jpg': 'Dřevěná nádoba s rytým zdobením, výška 25 cm. Nález z raně středověkého hradiště.',
-        'images/puzzle3.jpg': 'Fragment keramiky s otiskem textilie. Doba bronzová, sídliště z pozdní doby kamenné.'
+        'images/puzzle2.jpg': 'Bronzový srp.',
+        'images/puzzle3.jpg': 'Bronzová růžicová spona o rozměrech 34,7 x 19 cm. Kultura lužických popelnicových polí'
     };
 
     let currentPuzzleIndex = 0;
