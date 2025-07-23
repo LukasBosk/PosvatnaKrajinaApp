@@ -101,19 +101,24 @@ button:disabled {
     cursor: grab;
     border: 1px solid #eee;
     box-sizing: border-box;
-    position: relative; /* Důležité pro normální pozicování v gridu */
+    position: relative;
     user-select: none;
-    -webkit-user-drag: none; /* Pro Safari na iOS, aby se zabránilo nativnímu drag */
-    touch-action: none; /* Zabraňuje scrollingu/zoomování při dotyku */
+    -webkit-user-drag: none;
+    touch-action: none;
 }
 
 .puzzle-piece.dragging {
     opacity: 0.7;
     cursor: grabbing;
     z-index: 1000;
-    position: absolute; /* NOVĚ: Zajišťuje, že se dílek může volně pohybovat */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Vizuální efekt zvednutí */
-    transform: translate(-50%, -50%); /* Posune dílek tak, aby byl střed pod prstem/kurzorem */
+    position: absolute;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%);
+}
+
+.puzzle-piece.highlight { /* NOVÁ TŘÍDA PRO ZVÝRAZNĚNÍ */
+    border: 2px dashed #007bff; /* Modrý tečkovaný rámeček */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 .puzzle-piece.correct {
@@ -132,7 +137,6 @@ button:disabled {
     text-align: center;
 }
 
-/* Styl pro tlačítko Zpět mimo herní ovládání - NÁPIS TUČNĚ */
 .back-button {
     position: absolute;
     bottom: 20px;
@@ -173,7 +177,7 @@ button:disabled {
     }
 
     .header h1 {
-        font-size: 2em;
+        font-size: 1.5em;
     }
 
     .navigation-controls, .game-controls {
@@ -191,7 +195,6 @@ button:disabled {
         margin-bottom: 10px;
     }
 
-    /* Úprava tlačítka zpět pro menší obrazovky */
     .back-button {
         bottom: 10px;
         right: 10px;
