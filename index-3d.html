@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muzeum regionu Boskovicka 3D prohlížeč</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4285f4"/>
+    <script src="./tailwind.min.js"></script> 
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url('./pozadi.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center center;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: rgba(255, 255, 255, 0);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: background-color 0.5s ease-in-out;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .header img {
+            max-height: 120px;
+            width: auto;
+            border-radius: 8px;
+        }
+        h1 {
+            color: white;
+            font-size: 7.5em;
+            font-weight: bold;
+            margin: 0;
+        }
+        p {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .model-button {
+            background-color: rgba(66, 133, 244, 0.5);
+            color: white;
+            padding: 15px 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .model-button:hover {
+            background-color: #357ae8;
+            transform: translateY(-2px);
+        }
+        .model-button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        #loadingMessage {
+            color: #f4b400;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+        #errorMessage {
+            color: #ea4335;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #canvasContainer, #modelViewerElement {
+            width: 100%;
+            height: 500px;
+            background-color: transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        #canvasContainer canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .viewer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .back-button, .ar-button {
+            background-color: rgba(244, 180, 0, 0.5);
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .back-button:hover, .ar-button:hover:not(:disabled) {
+            background-color: #e0a300;
+            transform: translateY(-2px);
+        }
+        .back-button:active, .ar-button:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .ar-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+    .back-to-main-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(66, 133, 244, 0.9); /* Modré s 90% průhledností */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        text-decoration: none; /* Pro odkazy */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        z-index: 1000;
+        display: block; /* Zajišťuje, že je tlačítko viditelné na začátku */
+    }
+    .back-to-main-button:hover {
+        background-color: rgba(66, 133, 244, 1); /* Plně modré při najetí */
+        transform: translateY(-2px);
+    }
+    .back-to-main-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    </style>
+    <script src="./three.min.js"></script>
+    <script src="./GLTFLoader.js"></script>
+    <script src="./OBJLoader.js"></script>
+    <script src="./MTLLoader.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script src="./jszip.min.js"></script>
+    <script type="module" src="./model-viewer.min.js"></script>
+    <script nomodule src="./model-viewer-umd.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="modelListSection">
+            <div class="header">
+                <img src="./logo.png" alt="Logo Muzea regionu Boskovicka">
+                <h1>Muzeum regionu Boskovicka 3D prohlížeč</h1>
+            </div>
+            <p>Vyberte 3D model, který chcete prozkoumat.</p>
+
+            <div class="model-grid" id="modelGrid">
+            </div>
+        </div>
+
+        <div id="modelViewerSection" style="display: none; flex-direction: column; align-items: center;">
+            <div id="canvasContainer" style="display: none;">
+            </div>
+            <model-viewer id="modelViewerElement"
+                          ar
+                          ar-modes="webxr scene-viewer quick-look"
+                          camera-controls
+                          environment-intensity="0" 
+                          shadow-intensity="0" 
+                          camera-orbit="0deg 75deg 2.5m"  
+                          ar-placement="floor"
+                          style="width: 100%; height: 500px;">
+            </model-viewer>
+
+            <div id="loadingMessage">Načítání modelu...</div>
+            <div id="errorMessage"></div>
+            
+            <div class="viewer-controls">
+                <button class="back-button" id="backButton">Zpět na seznam modelů</button>
+                <button class="ar-button" id="arButton" disabled>Zobrazit v AR</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let currentModelObject = null;
+
+        const modelListSection = document.getElementById('modelListSection');
+        const modelViewerSection = document.getElementById('modelViewerSection');
+        const modelGrid = document.getElementById('modelGrid');
+        const canvasContainer = document.getElementById('canvasContainer'); 
+        const modelViewerElement = document.getElementById('modelViewerElement'); 
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const backButton = document.getElementById('backButton');
+        const arButton = document.getElementById('arButton');
+        const container = document.querySelector('.container');
+        const backToMainPageButton = document.querySelector('.back-to-main-button');
+
+        const models = [
+            { name: "Dláto", path: "./Dlato.glb", type: "glb" },
+            { name: "Dláto s tulejí", path: "./Dlatostuleji.glb", type: "glb" },
+            { name: "Kladívko", path: "./Kladivko.glb", type: "glb" },
+            { name: "Náramek", path: "./Naramek.glb", type: "glb" },
+            { name: "Sekera s tulejí", path: "./Sekera.glb", type: "glb" },
+            { name: "Srp", path: "./Srp.glb", type: "glb" },
+            { name: "Tordovaný kruh", path: "./Tordovanykruh.glb", type: "glb" },
+            { name: "Udidlo", path: "./Udidlo.glb", type: "glb" },
+            { name: "Lunicovitý závěsek", path: "./Zavesek1.glb", type: "glb" },
+            { name: "Kolečkovitý závěsek", path: "./Zavesek2.glb", type: "glb" },
+            { name: "Závěsek", path: "./Zavesek3.glb", type: "glb" },
+            { name: "Depot Jabloňany", path: "./jablonany.glb", type: "glb" },
+            { name: "Depot Boskovice úr. 1", path: "./boskovice.glb", type: "glb" },
+            { name: "Depot Boskovice úr. 2", path: "./depotboskovice2.glb", type: "glb" }
+        ];
+
+        function initThreeJS() {
+            if (typeof THREE === 'undefined') {
+                console.error("THREE.js knihovna není dostupná. Three.js modely (OBJ/ZIP) nebudou fungovat.");
+                errorMessage.innerHTML = "<strong>CHYBA NAČÍTÁNÍ:</strong> Knihovna THREE.js nebyla nalezena.<br>" +
+                                         "Ujistěte se, že jste stáhli soubor '<code>three.min.js</code>' a umístili jej " +
+                                         "do <strong>stejné složky</strong> jako tento HTML soubor.";
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            scene = new THREE.Scene();
+            scene.background = null; 
+
+            camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 5); 
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
+            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); 
+            renderer.setClearColor(0x000000, 0); 
+            canvasContainer.appendChild(renderer.domElement); 
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; 
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false; 
+            controls.minDistance = 1; 
+            controls.maxDistance = 50; 
+            controls.minPolarAngle = 0; 
+            controls.maxPolarAngle = Math.PI; 
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4); 
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3); 
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function onWindowResize() {
+            if (canvasContainer.style.display === 'flex') {
+                camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+                controls.update();
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (canvasContainer.style.display === 'flex') {
+                controls.update();
+                renderer.render(scene, camera);
+            }
+        }
+
+        async function loadModelIntoThreeJS(modelPath) {
+            loadingMessage.style.display = 'block';
+            loadingMessage.textContent = 'Načítání modelu...';
+            errorMessage.style.display = 'none';
+
+            container.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+
+            if (currentModelObject) {
+                scene.remove(currentModelObject);
+                currentModelObject.traverse(object => {
+                    if (object.isMesh) {
+                        object.geometry.dispose();
+                        if (Array.isArray(object.material)) {
+                            for (const material of object.material) cleanMaterial(material);
+                        } else {
+                            cleanMaterial(object.material);
+                        }
+                    }
+                });
+                currentModelObject = null;
+            }
+
+            const fileExtension = modelPath.split('.').pop().toLowerCase();
+            try {
+                if (fileExtension === 'obj') {
+                    const loader = new THREE.OBJLoader();
+                    loader.load(modelPath, (obj) => {
+                        currentModelObject = obj;
+                        centerModelGeometry(currentModelObject);
+                        scene.add(currentModelObject);
+                        fitCameraToModel(currentModelObject, camera, controls);
+                        loadingMessage.style.display = 'none';
+                        container.style.backgroundColor = 'rgb(255, 255, 255)';
+                    }, undefined, (error) => {
+                        console.error('Chyba při načítání OBJ modelu:', error);
+                        errorMessage.textContent = 'Chyba při načítání OBJ modelu. (Poznámka: OBJ modely bez .mtl souborů nemusí mít textury/barvy)';
+                        errorMessage.style.display = 'block';
+                        loadingMessage.style.display = 'none';
+                    });
+                } else if (fileExtension === 'zip') {
+                    const response = await fetch(modelPath);
+                    if (!response.ok) {
+                        throw new Error(`Nepodařilo se načíst ZIP soubor: ${response.statusText}`);
+                    }
+                    const arrayBuffer = await response.arrayBuffer();
+
+                    const zip = await JSZip.loadAsync(arrayBuffer);
+                    let objContent = null;
+                    let mtlContent = null;
+                    const textureMap = new Map();
+
+                    for (const filename in zip.files) {
+                        const zipEntry = zip.files[filename];
+                        const lowerFilename = filename.toLowerCase();
+
+                        if (lowerFilename.endsWith('.obj')) {
+                            objContent = await zipEntry.async('string');
+                        } else if (lowerFilename.endsWith('.mtl')) {
+                            mtlContent = await zipEntry.async('string');
+                        } else if (lowerFilename.endsWith('.jpg') || lowerFilename.endsWith('.png') || lowerFilename.endsWith('.jpeg')) {
+                            const dataUrl = `data:${zipEntry.mimeType};base64,${await zipEntry.async('base64')}`;
+                            textureMap.set(filename.split('/').pop(), dataUrl);
+                        }
+                    }
+
+                    if (!objContent) {
+                        throw new Error('ZIP archiv neobsahuje soubor .obj.');
+                    }
+
+                    let materials = null;
+                    if (mtlContent) {
+                        const mtlLoader = new THREE.MTLLoader();
+                        mtlLoader.manager = new THREE.LoadingManager();
+                        mtlLoader.manager.setURLModifier((url) => {
+                            const filename = url.split('/').pop();
+                            if (textureMap.has(filename)) {
+                                return textureMap.get(filename);
+                            }
+                            return url;
+                        });
+
+                        materials = mtlLoader.parse(mtlContent);
+                        materials.preload();
+                    }
+
+                    const objLoader = new THREE.OBJLoader();
+                    if (materials) {
+                        objLoader.setMaterials(materials);
+                    }
+
+                    const obj = objLoader.parse(objContent);
+                    currentModelObject = obj;
+                    centerModelGeometry(currentModelObject);
+                    scene.add(currentModelObject);
+                    fitCameraToModel(currentModelObject, camera, controls);
+                    loadingMessage.style.display = 'none';
+                    container.style.backgroundColor = 'rgb(255, 255, 255)';
+
+                } else {
+                    errorMessage.textContent = 'Neočekávaný formát souboru pro Three.js. Měl by být .obj nebo .zip.';
+                    errorMessage.style.display = 'block';
+                    loadingMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Obecná chyba při načítání souboru do Three.js:', error);
+                errorMessage.textContent = `Došlo k chybě při načítání: ${error.message}`;
+                errorMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+            }
+        }
+
+        function centerModelGeometry(object) {
+            const box = new THREE.Box3().setFromObject(object);
+            box.getCenter(object.position).negate();
+        }
+
+        function fitCameraToModel(object, camera, controls) {
+            const box = new THREE.Box3().setFromObject(object);
+            const size = box.getSize(new THREE.Vector3());
+
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+
+            cameraZ *= 1.2;
+
+            camera.position.set(0, 0, cameraZ);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+            controls.target.copy(new THREE.Vector3(0, 0, 0));
+            controls.update();
+        }
+
+        function cleanMaterial(material) {
+            if (Array.isArray(material)) {
+                for (const mat of material) {
+                    cleanMaterial(mat);
+                }
+                return;
+            }
+
+            for (const key in material) {
+                const value = material[key];
+                if (value && typeof value === 'object' && value.isTexture) {
+                    value.dispose();
+                }
+            }
+
+            if (material.dispose) {
+                material.dispose();
+            }
+        }
+
+        function handleModelClick(model) {
+            modelListSection.style.display = 'none';
+            modelViewerSection.style.display = 'flex';
+
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            container.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+
+            if (currentModelObject) {
+                scene.remove(currentModelObject);
+                currentModelObject = null;
+            }
+            if (backToMainPageButton) {
+                backToMainPageButton.style.display = 'none'; // Skryjeme tlačítko "Zpět na úvodní stránku"
+            }
+            if (model.type === 'glb') {
+                canvasContainer.style.display = 'none';
+                modelViewerElement.style.display = 'block';
+
+                modelViewerElement.src = model.path;
+                modelViewerElement.alt = model.name;
+                loadingMessage.textContent = 'Načítání 3D modelu (GLB)...';
+                arButton.disabled = true;
+                arButton.title = "";
+            } else if (model.type === 'obj' || model.type === 'zip') {
+                modelViewerElement.style.display = 'none';
+                canvasContainer.style.display = 'flex';
+
+                loadingMessage.textContent = `Načítání 3D modelu (${model.type.toUpperCase()})...`;
+                loadModelIntoThreeJS(model.path);
+                arButton.disabled = true;
+                arButton.title = "AR není pro OBJ/ZIP modely dostupná";
+            } else {
+                errorMessage.textContent = 'Nepodporovaný typ souboru modelu.';
+                errorMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+                arButton.disabled = true;
+                arButton.title = "Nepodporovaný typ modelu";
+            }
+        }
+
+        function showModelList() {
+            modelViewerSection.style.display = 'none';
+            modelListSection.style.display = 'block';
+            container.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+
+            if (backToMainPageButton) {
+                backToMainPageButton.style.display = 'block'; // Zobrazíme tlačítko "Zpět na úvodní stránku"
+            }
+            if (currentModelObject) {
+                scene.remove(currentModelObject);
+                currentModelObject.traverse(object => {
+                    if (object.isMesh) {
+                        object.geometry.dispose();
+                        if (Array.isArray(object.material)) {
+                            for (const material of object.material) cleanMaterial(material);
+                        } else {
+                            cleanMaterial(object.material);
+                        }
+                    }
+                });
+                currentModelObject = null;
+            }
+            if (camera && controls) {
+                camera.position.set(0, 0, 5);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+                controls.target.set(0, 0, 0);
+                controls.update();
+            }
+
+            modelViewerElement.src = '';
+            modelViewerElement.style.display = 'none';
+            arButton.disabled = true;
+            arButton.title = "";
+
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+
+        function generateModelButtons() {
+            modelGrid.innerHTML = '';
+            models.forEach(model => {
+                const button = document.createElement('button');
+                button.className = 'model-button';
+                button.textContent = model.name;
+                button.addEventListener('click', () => {
+                    handleModelClick(model);
+                });
+                modelGrid.appendChild(button);
+            });
+        }
+
+        backButton.addEventListener('click', showModelList);
+
+        arButton.addEventListener('click', async () => {
+            if (modelViewerElement && modelViewerElement.canActivateAR) {
+                modelViewerElement.activateAR();
+            } else {
+                errorMessage.textContent = "AR nelze aktivovat. Ujistěte se, že stránka běží na HTTPS a vaše zařízení podporuje WebXR.";
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        modelViewerElement.addEventListener('load', () => {
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            if (modelViewerElement.src.endsWith('.glb')) {
+                arButton.disabled = false;
+                arButton.title = "";
+                container.style.backgroundColor = 'rgb(255, 255, 255)';
+            }
+        });
+
+        modelViewerElement.addEventListener('error', (event) => {
+            loadingMessage.style.display = 'none';
+            errorMessage.textContent = 'Chyba při načítání modelu. Zkuste jiný model nebo zkontrolujte soubor.';
+            errorMessage.style.display = 'block';
+            console.error('Model-viewer: Chyba při načítání modelu:', event);
+            arButton.disabled = true;
+            arButton.title = "Chyba při načítání modelu, AR nedostupná";
+            container.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+        });
+
+        modelViewerElement.addEventListener('progress', (event) => {
+            if (event.detail.totalBytes) {
+                const loaded = event.detail.receivedBytes;
+                const total = event.detail.totalBytes;
+                const percentage = Math.round((loaded / total) * 100);
+                loadingMessage.textContent = `Načítání modelu... ${percentage}%`;
+            } else {
+                loadingMessage.textContent = `Načítání modelu...`;
+            }
+            loadingMessage.style.display = 'block';
+        });
+
+        // KÓD PRO REGISTRACI SERVICE WORKERU
+        // Tato část by měla být umístěna na konci souboru index.html nebo v samostatném skriptu
+        // spuštěném po načtení DOM.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker zaregistrován s rozsahem: ', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('Registrace Service Workeru selhala: ', error);
+                        errorMessage.innerHTML = "<strong>CHYBA OFFLINE:</strong> Registrace Service Workeru selhala.<br>" +
+                                                 "Ujistěte se, že stránka běží přes HTTPS a soubor '<code>service-worker.js</code>' je ve stejné složce.";
+                        errorMessage.style.display = 'block';
+                    });
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            generateModelButtons();
+
+            setTimeout(() => {
+                if (!customElements.get('model-viewer')) {
+                    errorMessage.innerHTML = "<strong>CHYBA NAČÍTÁNÍ:</strong> Web komponenta `model-viewer` nebyla nalezena.<br>" +
+                                             "Ujistěte se, že jste stáhli soubory '<code>model-viewer.min.js</code>' a '<code>model-viewer-umd.js</code>' " +
+                                             "a umístili je do <strong>stejné složky</strong> jako tento HTML soubor.<br>" +
+                                             "AR funkce nebude dostupná.";
+                    errorMessage.style.display = 'block';
+                    models.forEach((model, index) => {
+                        if (model.type === 'glb') {
+                            const button = modelGrid.children[index];
+                            if (button) {
+                                button.disabled = true;
+                                button.title = "AR prohlížeč není k dispozici";
+                            }
+                        }
+                    });
+                }
+            }, 500);
+        });
+    </script>
+    <a href="./index.html" class="back-to-main-button">Zpět</a>
+</body>
+</html>
