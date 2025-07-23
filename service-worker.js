@@ -7,6 +7,9 @@ const urlsToCache = [
   './', // Cesta k index.html
   './index.html',
   './index-3d.html',
+  './puzzle.html',
+  './script-puzzle.js',
+  './style-puzzle.css',
   './manifest.json',
   './service-worker.js',
   './tailwind.min.js',
@@ -24,6 +27,9 @@ const urlsToCache = [
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/maskable_icon.png',
+  './images/puzzle1.jpg',
+  './images/puzzle2.jpg',
+  './images/puzzle3.jpg',
   './ramecek1.png',
   './ramecek2.png',
   './juxtapose.html', // Nová cesta k juxtapose mapě
