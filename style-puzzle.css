@@ -99,7 +99,7 @@ button:disabled {
 .puzzle-piece {
     background-size: var(--puzzle-total-width) var(--puzzle-total-height);
     cursor: grab;
-    border: 1px solid #eee;
+    border: 1px solid #eee; /* Původní jemný rámeček */
     box-sizing: border-box;
     position: relative;
     user-select: none;
@@ -121,10 +121,9 @@ button:disabled {
     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
-/* ZMĚNA ZDE: Odstraněna zelená mřížka, vrácen jemný rámeček */
+/* ZMĚNA ZDE: Úplné odstranění rámečku po dokončení */
 .puzzle-piece.correct {
-    border: 1px solid #eee; /* Vrátí se k původnímu, jemnému rámečku */
-    /* Pokud chcete úplně odstranit rámečky, použijte: border: none; */
+    border: none; /* Odstraní jakýkoli rámeček, aby zůstal čistý obrázek */
 }
 
 #message {
