@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalPositions = [];
 
     let draggedPiece = null;
-    let offsetX = 0; // Ofset pro pozici kurzoru/prstu uvnitř taženého dílku
-    let offsetY = 0;
+    // offsetX a offsetY již nejsou potřeba pro centrování dílku pod prstem s transform: translate
+    // Byly by potřeba, pokud bychom chtěli, aby se dotykový bod na dílku držel pod prstem
 
     // --- Funkce pro výpočet rozměrů puzzle na základě velikosti okna a rozměrů obrázku ---
     function calculatePuzzleDimensions(imageNaturalWidth, imageNaturalHeight) {
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             piece.style.backgroundPosition = `-${col * pieceWidth}px -${row * pieceHeight}px`;
             
             piece.dataset.originalIndex = i;
-            piece.draggable = true; // Zachováno pro desktop drag&drop
+            piece.draggable = true;
 
             pieces.push(piece);
             currentPositions.push(i);
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             piece.style.removeProperty('transform'); 
             piece.style.removeProperty('left');
             piece.style.removeProperty('top');
-            piece.style.removeProperty('z-index');
+            piece.style.removeProperty('z-index'); // Z-index se nastaví přes třídu .dragging
         });
     }
 
@@ -195,21 +195,19 @@ document.addEventListener('DOMContentLoaded', () => {
             piece.addEventListener('dragstart', (e) => {
                 draggedPiece = piece;
                 e.dataTransfer.effectAllowed = 'move';
-                // Vypočítáme offset kurzoru vzhledem k rohu dílku
-                const rect = piece.getBoundingClientRect();
-                offsetX = e.clientX - rect.left;
-                offsetY = e.clientY - rect.top;
-
-                // Nastavíme transform pro okamžité umístění pod kurzor (v CSS už je translate(-50%,-50%))
-                draggedPiece.style.transform = `translate(${e.clientX - rect.left - rect.width / 2}px, ${e.clientY - rect.top - rect.height / 2}px)`;
-
                 piece.classList.add('dragging');
+                // Nastavíme transform pro okamžité umístění pod kurzor
+                const rect = piece.getBoundingClientRect();
+                draggedPiece.style.left = `${e.clientX}px`;
+                draggedPiece.style.top = `${e.clientY}px`;
             });
 
             piece.addEventListener('dragend', () => {
                 if (draggedPiece) {
                     draggedPiece.classList.remove('dragging');
                     draggedPiece.style.transform = ''; // Reset transform
+                    draggedPiece.style.removeProperty('left'); // Důležité: Reset pro absolute positioning
+                    draggedPiece.style.removeProperty('top'); // Důležité: Reset pro absolute positioning
                     draggedPiece = null;
                     positionPieces(); // Zajistí návrat na grid pozici
                     checkWin();
@@ -217,8 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             piece.addEventListener('dragover', (e) => {
-                e.preventDefault(); // Umožňuje drop
+                e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
+                // Pro plynulé sledování kurzoru myší během dragover
+                if (draggedPiece) {
+                    draggedPiece.style.left = `${e.clientX}px`;
+                    draggedPiece.style.top = `${e.clientY}px`;
+                }
             });
 
             piece.addEventListener('drop', (e) => {
@@ -230,35 +233,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const tempCurrentPositionOfDragged = currentPositions[draggedIndexInPiecesArray];
                     currentPositions[draggedIndexInPiecesArray] = currentPositions[targetIndexInPiecesArray];
                     currentPositions[targetIndexInPiecesArray] = tempCurrentPositionOfDragged;
-
-                    // positionPieces() a checkWin() se volají v dragend, aby se zamezilo dvojímu volání
                 }
+                // positionPieces() a checkWin() se volají v dragend
             });
 
             // --- Dotykové události (pro mobilní zařízení/tablety) ---
-            let initialPieceLeft, initialPieceTop; // Pozice dílku před přetažením
-
             piece.addEventListener('touchstart', (e) => {
                 e.preventDefault(); // Zabrání výchozímu chování prohlížeče (scrollování, kontextové menu)
 
                 draggedPiece = piece;
-                draggedPiece.classList.add('dragging');
+                draggedPiece.classList.add('dragging'); // Aplikuje position:absolute a transform:translate(-50%,-50%)
 
                 const touch = e.touches[0];
-                const rect = draggedPiece.getBoundingClientRect();
-                
-                // Spočítáme offset dotyku uvnitř dílku
-                offsetX = touch.clientX - rect.left;
-                offsetY = touch.clientY - rect.top;
-
-                // Uložíme počáteční pozici dílku pro relativní pohyb
-                initialPieceLeft = rect.left;
-                initialPieceTop = rect.top;
-
-                // Okamžitě posuneme dílek na absolutní pozici pod prstem (s ohledem na transform -50%)
-                draggedPiece.style.left = `${initialPieceLeft}px`;
-                draggedPiece.style.top = `${initialPieceTop}px`;
-                draggedPiece.style.transform = `translate(${touch.clientX - rect.left - rect.width / 2}px, ${touch.clientY - rect.top - rect.height / 2}px)`;
+                // Nastavíme pozici taženého dílku tak, aby jeho střed byl přesně pod prstem
+                draggedPiece.style.left = `${touch.clientX}px`;
+                draggedPiece.style.top = `${touch.clientY}px`;
             });
 
             piece.addEventListener('touchmove', (e) => {
@@ -266,9 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault(); // Zabrání scrollování během přetahování
 
                 const touch = e.touches[0];
-                // Posuneme dílek absolutně na pozici prstu
-                draggedPiece.style.left = `${touch.clientX - offsetX}px`;
-                draggedPiece.style.top = `${touch.clientY - offsetY}px`;
+                // Aktualizujeme pozici dílku tak, aby jeho střed stále sledoval prst
+                draggedPiece.style.left = `${touch.clientX}px`;
+                draggedPiece.style.top = `${touch.clientY}px`;
             });
 
             piece.addEventListener('touchend', (e) => {
@@ -292,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Resetujeme styly taženého dílku
                 draggedPiece.classList.remove('dragging');
-                // Není potřeba resetovat left/top, to se vyřeší v positionPieces
                 draggedPiece.style.removeProperty('left');
                 draggedPiece.style.removeProperty('top');
                 draggedPiece.style.removeProperty('transform'); // Důležité pro odstranění inline transformace
