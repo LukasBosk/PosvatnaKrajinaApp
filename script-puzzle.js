@@ -15,7 +15,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const puzzleImages = [
         'images/puzzle1.jpg',
         'images/puzzle2.jpg',
-        'images/puzzle3.jpg'
+        'images/puzzle3.jpg',
+        'images/puzzle4.jpg',
+        'images/puzzle5.jpg',
+        'images/puzzle6.jpg',
+        'images/puzzle7.jpg',
+        'images/puzzle8.jpg',
+        'images/puzzle9.jpg',
+        'images/puzzle10.jpg',
+        'images/puzzle11.jpg',
+        'images/puzzle12.jpg',
+        'images/puzzle13.jpg',
+        'images/puzzle14.jpg',
+        'images/puzzle15.jpg',
+        'images/puzzle16.jpg',
+        'images/puzzle17.jpg',
+        'images/puzzle18.jpg',
+        'images/puzzle19.jpg',
+        'images/puzzle20.jpg',
+        'images/puzzle21.jpg',
+        'images/puzzle22.jpg',
+        'images/puzzle23.jpg',
+        'images/puzzle24.jpg'
     ];
 
     const puzzleMessages = {
