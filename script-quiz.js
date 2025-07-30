@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Pohřební nádoba'
             ],
             correctAnswer: 2
+        },
         {
             image: 'images/puzzle4.jpg',
             question: 'Jaký artefakt je zobrazen na obrázku?',
@@ -127,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Kostrový',
                 'Žárový'
             ],
-            correctAnswer: 2
+            correctAnswer: 1
         },
         // Zde můžete přidat další otázky
     ];
