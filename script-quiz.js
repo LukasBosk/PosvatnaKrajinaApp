@@ -23,9 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
             question: 'K čemu sloužil tento předmět?',
             options: [
                 'Ke sklízení obilí',
-                'Ke krájení masa'
+                'K porcování masa'
             ],
             correctAnswer: 0
+        },
+        {
+            image: 'images/puzzle11.jpg',
+            question: 'Odkud může pocházet surovina (jantar) použitá k výrobě tohoto předmtěu?',
+            options: [
+                'Z oblasti Středomoří',
+                'Z oblasti Baltu'
+            ],
+            correctAnswer: 1
         },
         {
             image: 'images/puzzle3.jpg',
@@ -37,15 +46,43 @@ document.addEventListener('DOMContentLoaded', () => {
             correctAnswer: 0
         },
         {
+            image: 'images/puzzle10.jpg',
+            question: 'K čemu sloužil předmět na obrázku?',
+            options: [
+                'K odlévání bronzových předmětů',
+                'K broušení bronzových předmětů'
+            ],
+            correctAnswer: 0
+        },
+        {
             // Další textová otázka
             question: 'Jak se jinak říká hromadným nálezům/pokladům?',
             options: [
                 'Despoty',
                 'Depoty',
-                'Deploty',
+                'Deploty'
             ],
             correctAnswer: 1
         },
+        {
+            // Další textová otázka
+            question: 'Do jakého období přibližně můžeme zařadit mladší a pozdní dobu bronzovou?',
+            options: [
+                '750 - 400 př. n. l.',
+                '2200 - 1300 př. n. l.',
+                '1300 - 750 př. n. l.'
+            ],
+            correctAnswer: 2
+        },
+        {
+            // Další textová otázka
+            question: 'Na co odkazuje slovo "popelnice" z pojmenování Kultura lužických popelnicových polí?',
+            options: [
+                'Odpadní jáma',
+                'Odpadní nádoba',
+                'Pohřební nádoba'
+            ],
+            correctAnswer: 2
         {
             image: 'images/puzzle4.jpg',
             question: 'Jaký artefakt je zobrazen na obrázku?',
@@ -54,7 +91,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Bronzový závěsek'
             ],
             correctAnswer: 1
-        }
+        },
+        {
+            image: 'images/puzzle17.jpg',
+            question: 'Jaký artefakt je zobrazen na obrázku?',
+            options: [
+                'Rukojeť meče',
+                'Závěsek'
+            ],
+            correctAnswer: 1
+        },
+        {
+            image: 'images/puzzle19.jpg',
+            question: 'Jaký artefakt je zobrazen na obrázku?',
+            options: [
+                'Bronzové kopí',
+                'Bronzové dláto'
+            ],
+            correctAnswer: 1
+        },
+        {
+            // Další textová otázka
+            question: 'Co je to bronz?',
+            options: [
+                'Slitina mědi a zinku',
+                'Slitina mědi a niklu',
+                'Slitina mědi a cínu'
+            ],
+            correctAnswer: 2
+        },
+        {
+            // Další textová otázka
+            question: 'Jaký byl nejběžnšjší typ pohřbu během mladší a pozdní doby bronzové',
+            options: [
+                'Kostrový',
+                'Žárový'
+            ],
+            correctAnswer: 2
+        },
         // Zde můžete přidat další otázky
     ];
 
