@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackMessage = document.getElementById('feedback');
     const nextButton = document.getElementById('next-button');
     const quizScoreDisplay = document.getElementById('quiz-score');
+    const imageContainer = document.querySelector('.image-container'); // NOVINKA: Získáme referenci na image-container
 
     // Kvízové otázky
-    // Každá otázka má: obrázek, text otázky, pole tří možností a index správné odpovědi (0, 1 nebo 2)
     const quizQuestions = [
         {
             image: 'images/puzzle1.jpg',
@@ -35,10 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Část bronzového opasku'
             ],
             correctAnswer: 0
-        }
-        // Zde můžete přidat další otázky
-        // Příklad další otázky:
-        /*
+        },
+        {
+            // Další textová otázka
+            question: 'Jak se jinak říká hromadným nálezům/pokladům?',
+            options: [
+                'Despoty',
+                'Depoty',
+                'Deploty',
+            ],
+            correctAnswer: 1
+        },
         {
             image: 'images/puzzle4.jpg',
             question: 'Jaký artefakt je zobrazen na obrázku?',
@@ -48,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ],
             correctAnswer: 1
         }
-        */
+        // Zde můžete přidat další otázky
     ];
 
     let shuffledQuestions = [];
@@ -73,9 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
         questionText.textContent = currentQuestion.question;
-        quizImage.src = currentQuestion.image;
         feedbackMessage.textContent = '';
-        nextButton.classList.add('hidden'); // Skryje tlačítko "Další otázka"
+        nextButton.classList.add('hidden');
+
+        // NOVINKA: Kontrola, zda otázka obsahuje obrázek
+        if (currentQuestion.image) {
+            quizImage.src = currentQuestion.image;
+            imageContainer.classList.remove('hidden'); // Zobrazit kontejner s obrázkem
+        } else {
+            imageContainer.classList.add('hidden'); // Skrýt kontejner s obrázkem
+            quizImage.src = ''; // Vyprázdnit src, aby se nic nenačítalo
+        }
+
 
         answersContainer.innerHTML = ''; // Vyčistí předchozí tlačítka
 
@@ -117,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Funkce pro zobrazení finálního skóre
     function displayFinalScore() {
         questionText.textContent = 'Kvíz dokončen!';
-        quizImage.classList.add('hidden'); // Skryje obrázek
+        imageContainer.classList.add('hidden'); // Skryje obrázek i jeho kontejner
         answersContainer.innerHTML = ''; // Vyčistí tlačítka
         feedbackMessage.textContent = '';
         nextButton.classList.add('hidden');
