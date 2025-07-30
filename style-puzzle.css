@@ -92,7 +92,7 @@ button:disabled {
     position: relative;
     padding: 5px;
     border-radius: 5px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .puzzle-piece {
