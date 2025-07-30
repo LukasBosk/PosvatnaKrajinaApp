@@ -92,7 +92,6 @@ button:disabled {
     position: relative;
     padding: 5px;
     border-radius: 5px;
-    max-width: 90vw;
     overflow: hidden;
 }
 
