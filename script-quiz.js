@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Rukojeť meče',
                 'Závěsek'
             ],
-            correctAnswer: 1
+            correctAnswer: 0
         },
         {
             image: 'images/puzzle19.jpg',
