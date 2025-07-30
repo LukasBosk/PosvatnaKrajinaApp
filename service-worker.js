@@ -1,4 +1,4 @@
-const CACHE_NAME = 'muzeum-boskovicka-cache-v17';
+const CACHE_NAME = 'muzeum-boskovicka-cache-v18';
 
 // Seznam souborů, které se mají při instalaci Service Workeru uložit do cache
 // DŮLEŽITÉ: Ujistěte se, že zde jsou uvedeny VŠECHNY soubory, které aplikace potřebuje k offline provozu,
