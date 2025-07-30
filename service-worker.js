@@ -7,10 +7,13 @@ const urlsToCache = [
   './', // Cesta k index.html
   './index.html',
   './index-3d.html',
+  './quiz.html',  
   './mapa.html',
   './puzzle.html',
   './script-puzzle.js',
+  './script-quiz.js',
   './style-puzzle.css',
+  './style-quiz.css',
   './manifest.json',
   './service-worker.js',
   './tailwind.min.js',
