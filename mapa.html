@@ -83,11 +83,11 @@
             max-width: 1200px; /* Omezení šířky pro desktop */
         }
         
-        /* NOVÝ HLAVNÍ KONTEJNER pro uspořádání zoom, mapa, kategorie */
-        .map-and-controls-section {
+        /* Hlavní kontejner pro mapu a ovladače kategorií */
+        .map-and-controls-wrapper {
             display: flex;
-            flex-direction: row; /* Desktop: zoom (vlevo) | mapa (uprostřed) | kategorie (vpravo) */
-            gap: 15px; /* Mezera mezi sloupci */
+            flex-direction: row; /* Desktop: mapa (vlevo) | kategorie (vpravo) */
+            gap: 15px; /* Mezera mezi mapou a tlačítky */
             width: 100%;
             max-width: 1200px;
             background-color: rgba(255, 255, 255, 0.7);
@@ -103,27 +103,27 @@
 
         .map-container {
             position: relative;
-            flex: 1 1 0; /* Mapa zabere veškerý dostupný prostor ve flex kontejneru */
+            flex: 1; /* Mapa zabere veškerý dostupný prostor ve flex kontejneru */
             min-width: 280px;
             min-height: 200px; /* Minimální výška mapy, aby se nesložila */
-            overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
-            cursor: grab;
+            overflow: hidden; /* Důležité pro oříznutí */
+            /* cursor: grab; odstraněno */
             display: block; /* Důležité pro nastavení výšky/šířky */
         }
-        .map-container.panning {
+        /* .map-container.panning { odstraněno
             cursor: grabbing;
-        }
+        } */
 
         .map-wrapper {
             position: absolute;
             top: 0;
             left: 0;
-            transform-origin: 0 0;
-            transition: transform 0.05s ease-out;
-            will-change: transform;
-            z-index: 10;
             width: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou šířku kontejneru */
             height: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou výšku kontejneru */
+            /* transform-origin: 0 0; odstraněno */
+            /* transition: transform 0.05s ease-out; odstraněno */
+            /* will-change: transform; odstraněno */
+            z-index: 10;
         }
 
         .map-base, .map-overlay {
@@ -178,48 +178,9 @@
             box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(66, 133, 244, 1);
         }
 
-        .zoom-controls {
-            /* ODSTRANĚNO position: absolute - nyní je součástí flex flow */
-            display: flex;
-            flex-direction: column; /* Desktop: tlačítka zoomu vertikálně */
-            gap: 8px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            flex-shrink: 0; /* Zabrání zmenšování zoom tlačítek */
-        }
-
-        .zoom-button, .reset-button {
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 50%;
-            background-color: #1a73e8;
-            color: white;
-            font-size: 1.5em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .zoom-button:hover, .reset-button:hover {
-            background-color: #0f4a7b;
-            transform: scale(1.05);
-        }
-        .zoom-button:active, .reset-button:active {
-            transform: scale(1);
-        }
-        .reset-button {
-            font-size: 0.9em;
-            border-radius: 8px;
-            width: auto;
-            padding: 0 10px;
-            height: 35px;
-        }
+        /* .zoom-controls { odstraněno */
+        /* Styly pro zoom ovládání jsou odstraněny */
+        /* } */
         
         .back-button {
             position: fixed; /* Zůstává fixed, aby neovlivňoval layout */
@@ -268,8 +229,8 @@
                 padding: 6px 8px;
             }
 
-            .map-and-controls-section {
-                flex-direction: column; /* Na mobilech se přepne na sloupec: mapa | kategorie | zoom */
+            .map-and-controls-wrapper {
+                flex-direction: column; /* Na mobilech se přepne na sloupec: mapa | kategorie */
                 padding: 8px;
                 gap: 8px;
                 margin-bottom: 8px;
@@ -299,23 +260,7 @@
                     max-width: 100%; /* Na nejmenších obrazovkách zabere celou šířku */
                 }
             }
-
-            .zoom-controls {
-                flex-direction: row; /* Tlačítka zoomu horizontálně na mobilu */
-                justify-content: center; /* Vycentrovat je horizontálně */
-                padding: 8px;
-                gap: 5px;
-            }
-            .zoom-button, .reset-button {
-                width: 32px;
-                height: 32px;
-                font-size: 1.1em;
-            }
-            .reset-button {
-                padding: 0 8px;
-                height: 32px;
-            }
-
+            
             .back-button {
                 bottom: 8px;
                 right: 8px;
@@ -333,13 +278,7 @@
 
     <h2 class="map-heading" id="mapHeading">Depoty</h2>
 
-    <div class="map-and-controls-section">
-        <div class="zoom-controls">
-            <button class="zoom-button" id="zoomInBtn">+</button>
-            <button class="zoom-button" id="zoomOutBtn">-</button>
-            <button class="reset-button" id="resetZoomBtn">Reset</button>
-        </div>
-
+    <div class="map-and-controls-wrapper">
         <div class="map-container" id="mapContainer">
             <div class="map-wrapper" id="mapWrapper">
                 <img src="./prazdna.jpg" alt="Základní mapa" class="map-base">
@@ -368,74 +307,32 @@
             
             const mapContainer = document.getElementById('mapContainer');
             const mapWrapper = document.getElementById('mapWrapper');
-            const zoomInBtn = document.getElementById('zoomInBtn');
-            const zoomOutBtn = document.getElementById('zoomOutBtn');
-            const resetZoomBtn = document.getElementById('resetZoomBtn');
             const baseMapImage = document.querySelector('.map-base');
 
-            const MAP_INTRINSIC_WIDTH = 2770;
-            const MAP_INTRINSIC_HEIGHT = 2910;
+            // Odstraněny proměnné pro zoom a pan
 
-            let initialScale = 1;
-            let currentScale = 1;
-            let currentX = 0;
-            let currentY = 0;
-            let isDragging = false;
-            let initialClientX, initialClientY;
-            let initialMapX, initialMapY;
-
-            const ZOOM_STEP = 0.2;
-            const MAX_ZOOM_FACTOR = 4;
-            const MIN_ZOOM_FACTOR = 1;
-
-            const defaultTransition = mapWrapper.style.transition;
-
-            function applyTransform() {
-                const totalScale = initialScale * currentScale;
-                mapWrapper.style.transform = `scale(${totalScale}) translate(${currentX}px, ${currentY}px)`;
-            }
-
-            function clampPan() {
-                const totalScale = initialScale * currentScale;
-                const scaledMapWidth = MAP_INTRINSIC_WIDTH * totalScale;
-                const scaledMapHeight = MAP_INTRINSIC_HEIGHT * totalScale;
-
-                const containerWidth = mapContainer.offsetWidth;
-                const containerHeight = mapContainer.offsetHeight;
-
-                let maxX = 0;
-                if (scaledMapWidth < containerWidth) {
-                    maxX = (containerWidth - scaledMapWidth) / 2 / totalScale;
-                }
-                let minX = (containerWidth - scaledMapWidth) / totalScale;
-                if (scaledMapWidth < containerWidth) {
-                    minX = (containerWidth - scaledMapWidth) / 2 / totalScale;
-                }
-
-                let maxY = 0;
-                if (scaledMapHeight < containerHeight) {
-                    maxY = (containerHeight - scaledMapHeight) / 2 / totalScale;
-                }
-                let minY = (containerHeight - scaledMapHeight) / totalScale;
-                if (scaledMapHeight < containerHeight) {
-                    minY = (containerHeight - scaledMapHeight) / 2 / totalScale;
-                }
-                
-                currentX = Math.max(Math.min(currentX, maxX), minX);
-                currentY = Math.max(Math.min(currentY, maxY), minY);
-            }
-
+            // Funkce pro nastavení velikosti mapy v kontejneru
             function resizeMap() {
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
+                // Určíme měřítko tak, aby se mapa vešla do kontejneru bez deformace
+                const MAP_INTRINSIC_WIDTH = baseMapImage.naturalWidth || 2770; // Použijeme skutečnou šířku obrázku, nebo fallback
+                const MAP_INTRINSIC_HEIGHT = baseMapImage.naturalHeight || 2910; // Použijeme skutečnou výšku obrázku, nebo fallback
+                
                 const scaleX = containerWidth / MAP_INTRINSIC_WIDTH;
                 const scaleY = containerHeight / MAP_INTRINSIC_HEIGHT;
                 
-                initialScale = Math.min(scaleX, scaleY);
+                const scale = Math.min(scaleX, scaleY);
 
-                mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH}px`;
-                mapWrapper.style.height = `${MAP_INTRINSIC_HEIGHT}px`;
+                // Nastavíme velikost map-wrapperu podle vypočítaného měřítka
+                mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH * scale}px`;
+                mapWrapper.style.height = `${MAP_INTRINSIC_HEIGHT * scale}px`;
+
+                // Vycentrujeme mapu uvnitř kontejneru
+                const offsetX = (containerWidth - (MAP_INTRINSIC_WIDTH * scale)) / 2;
+                const offsetY = (containerHeight - (MAP_INTRINSIC_HEIGHT * scale)) / 2;
+                mapWrapper.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
                 overlays.forEach(img => {
                     img.style.width = '100%';
@@ -443,113 +340,7 @@
                 });
                 baseMapImage.style.width = '100%';
                 baseMapImage.style.height = '100%';
-
-                currentScale = MIN_ZOOM_FACTOR;
-                currentX = 0;
-                currentY = 0;
-                
-                clampPan();
-                applyTransform();
             }
-
-            zoomInBtn.addEventListener('click', () => {
-                const oldScale = currentScale;
-                currentScale = Math.min(currentScale + ZOOM_STEP, MAX_ZOOM_FACTOR);
-                const factor = currentScale / oldScale;
-                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
-                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
-                clampPan();
-                applyTransform();
-            });
-
-            zoomOutBtn.addEventListener('click', () => {
-                const oldScale = currentScale;
-                currentScale = Math.max(currentScale - ZOOM_STEP, MIN_ZOOM_FACTOR);
-                const factor = currentScale / oldScale;
-                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
-                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
-                clampPan();
-                applyTransform();
-                if (currentScale === MIN_ZOOM_FACTOR) {
-                    resetZoomBtn.click();
-                }
-            });
-
-            resetZoomBtn.addEventListener('click', () => {
-                currentScale = MIN_ZOOM_FACTOR;
-                currentX = 0;
-                currentY = 0;
-                clampPan();
-                applyTransform();
-            });
-
-            mapContainer.addEventListener('mousedown', (e) => {
-                if (currentScale > MIN_ZOOM_FACTOR) {
-                    isDragging = true;
-                    mapContainer.classList.add('panning');
-                    mapWrapper.style.transition = 'none';
-
-                    initialClientX = e.clientX;
-                    initialClientY = e.clientY;
-                    initialMapX = currentX;
-                    initialMapY = currentY;
-                }
-            });
-
-            mapContainer.addEventListener('mouseup', () => {
-                isDragging = false;
-                mapContainer.classList.remove('panning');
-                mapWrapper.style.transition = defaultTransition;
-            });
-
-            mapContainer.addEventListener('mouseleave', () => {
-                isDragging = false;
-                mapContainer.classList.remove('panning');
-                mapWrapper.style.transition = defaultTransition;
-            });
-
-            mapContainer.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                currentX = initialMapX + (e.clientX - initialClientX) / (initialScale * currentScale);
-                currentY = initialMapY + (e.clientY - initialClientY) / (initialScale * currentScale);
-                clampPan();
-                applyTransform();
-            });
-
-            mapContainer.addEventListener('touchstart', (e) => {
-                if (currentScale > MIN_ZOOM_FACTOR && e.touches.length === 1) {
-                    isDragging = true;
-                    mapContainer.classList.add('panning');
-                    mapWrapper.style.transition = 'none';
-
-                    initialClientX = e.touches[0].clientX;
-                    initialClientY = e.touches[0].clientY;
-                    initialMapX = currentX;
-                    initialMapY = currentY;
-                }
-            }, { passive: false });
-
-            mapContainer.addEventListener('touchend', () => {
-                isDragging = false;
-                mapContainer.classList.remove('panning');
-                mapWrapper.style.transition = defaultTransition;
-            });
-
-            mapContainer.addEventListener('touchcancel', () => {
-                isDragging = false;
-                mapContainer.classList.remove('panning');
-                mapWrapper.style.transition = defaultTransition;
-            });
-
-            mapContainer.addEventListener('touchmove', (e) => {
-                if (!isDragging || e.touches.length !== 1) return;
-                e.preventDefault();
-                currentX = initialMapX + (e.touches[0].clientX - initialClientX) / (initialScale * currentScale);
-                currentY = initialMapY + (e.touches[0].clientY - initialClientY) / (initialScale * currentScale);
-                clampPan();
-                applyTransform();
-            }, { passive: false });
 
             const initialActiveButton = document.querySelector('.map-button.active');
             if (initialActiveButton) {
@@ -567,13 +358,15 @@
                         activeOverlay.classList.add('active');
                     }
                     mapHeading.textContent = button.textContent;
-                    resetZoomBtn.click();
+                    // Po změně kategorie znovu zarovnáme mapu na střed
+                    resizeMap(); 
                 });
             });
 
+            // Přesunuto sem, aby se mapa správně inicializovala
             window.addEventListener('resize', resizeMap);
-            baseMapImage.onload = resizeMap;
-            if (baseMapImage.complete) {
+            baseMapImage.onload = resizeMap; // Zajistí, že se mapa nastaví po načtení obrázku
+            if (baseMapImage.complete) { // Pokud už je obrázek načtený
                 resizeMap();
             }
         });
