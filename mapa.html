@@ -107,8 +107,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* object-fit: contain; */ /* Není už nutné, pokud se aspect-ratio kontejneru shoduje */
-            object-fit: fill; /* Můžete zkusit i 'cover' pokud byste chtěl aby zaplnil celou plochu a ořízl se */
+            /* ZMĚNA ZDE: Zpět na 'contain' */
+            object-fit: contain; 
             user-select: none;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -226,6 +226,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
+        /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony) */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -252,6 +253,8 @@
             .map-container {
                 width: 100%;
                 max-width: none;
+                /* ZMĚNA ZDE: Omezení výšky pro mobil (zejména na ležato) */
+                max-height: 80vh; /* Omezí výšku mapy na 80% výšky viewportu */
             }
 
             .button-controls {
@@ -416,7 +419,6 @@
                 if (!isDragging) return;
                 e.preventDefault();
                 
-                // PŮVODNÍ A FUNKČNÍ LOGIKA OMEZENÍ POSUVU
                 let newX = initialMapX + (e.clientX - initialClientX);
                 let newY = initialMapY + (e.clientY - initialClientY);
 
@@ -482,7 +484,6 @@
                 if (!isDragging || e.touches.length !== 1) return;
                 e.preventDefault();
                 
-                // PŮVODNÍ A FUNKČNÍ LOGIKA OMEZENÍ POSUVU
                 let newX = initialMapX + (e.touches[0].clientX - initialClientX);
                 let newY = initialMapY + (e.touches[0].clientY - initialClientY);
 
