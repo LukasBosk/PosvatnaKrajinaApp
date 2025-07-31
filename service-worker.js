@@ -55,6 +55,12 @@ const urlsToCache = [
   './images/puzzle22.jpg',
   './images/puzzle23.jpg',
   './images/puzzle24.jpg',
+  './depoty-body.png',
+  './hradiste-body.png',
+  './pohrebiste-body.png',
+  './sidliste-body.png',
+  './prazdna.jpg',
+  './prazdna2.jpg',
   './ramecek1.png',
   './ramecek2.png',
   './juxtapose.html', // Nová cesta k juxtapose mapě
