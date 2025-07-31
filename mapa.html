@@ -11,7 +11,7 @@
             width: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Zamezí scrollování celého dokumentu */
+            overflow: hidden; /* Zamezí scrollování celého dokumentu, pokud to není nutné */
         }
 
         body {
@@ -104,6 +104,7 @@
         .map-container {
             position: relative; /* Důležité pro absolutní pozicování obrázků uvnitř */
             flex-grow: 1; /* Mapa zabere veškerý dostupný prostor */
+            flex-shrink: 1; /* Povolí zmenšení mapy, pokud je málo místa */
             /* aspect-ratio je nastaven v JS na baseMapImage.naturalWidth / baseMapImage.naturalHeight */
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
@@ -112,6 +113,7 @@
             overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
             min-height: 200px; /* Minimální výška mapy, aby se nesložila */
+            min-width: 300px; /* DŮLEŽITÉ: Zabrání mapě, aby se příliš zúžila */
             display: flex; /* Flexbox pro centrování map-wrapperu */
             justify-content: center; /* Horizontální centrování */
             align-items: center; /* Vertikální centrování */
@@ -155,8 +157,8 @@
             display: flex;
             flex-direction: column; /* Tlačítka vertikálně pod sebou */
             gap: 20px; /* Mezera mezi sadami tlačítek */
-            flex-shrink: 0; /* Nenechá se zmenšit */
-            flex-grow: 0; /* Neroste */
+            flex-shrink: 0; /* DŮLEŽITÉ: Nenechá se zmenšit */
+            flex-grow: 0; /* DŮLEŽITÉ: Neroste */
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -294,6 +296,8 @@
 
             .map-container {
                 min-height: 150px; /* Snížena min-height pro mobil */
+                min-width: unset; /* Na mobilu se min-width odebere, aby se mohla roztáhnout */
+                width: 100%; /* Důležité: Mapa zabere 100% dostupné šířky v řádkovém režimu */
             }
             
             .controls-column {
