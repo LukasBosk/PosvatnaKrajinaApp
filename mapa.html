@@ -159,7 +159,7 @@
         /* Ovládací prvky zoomu */
         .zoom-controls {
             position: absolute;
-            bottom: 20px; /* Změněno z 10px, aby nekolidovalo se zpět tlačítkem */
+            bottom: 20px;
             left: 20px;
             z-index: 30;
             display: flex;
@@ -196,7 +196,7 @@
         }
         .reset-button {
             font-size: 0.9em;
-            border-radius: 8px; /* Tlačítko reset bude spíše obdélníkové */
+            border-radius: 8px;
             width: auto;
             padding: 0 10px;
             height: 35px;
@@ -280,9 +280,9 @@
             }
 
             .zoom-controls {
-                bottom: 10px; /* Přesunuto výše na mobilu */
+                bottom: 10px;
                 left: 10px;
-                flex-direction: row; /* Tlačítka vedle sebe na mobilu */
+                flex-direction: row;
                 padding: 8px;
                 gap: 5px;
             }
@@ -348,7 +348,6 @@
             const overlays = document.querySelectorAll('.map-overlay');
             const mapHeading = document.getElementById('mapHeading');
             
-            // Pro zoom a panování
             const mapContainer = document.getElementById('mapContainer');
             const mapWrapper = document.getElementById('mapWrapper');
             const zoomInBtn = document.getElementById('zoomInBtn');
@@ -362,24 +361,21 @@
             let startX, startY;
 
             const MIN_SCALE = 1;
-            const MAX_SCALE = 4; // Maximální úroveň zoomu
-            const ZOOM_STEP = 0.2; // Krok zvětšení/zmenšení
+            const MAX_SCALE = 4;
+            const ZOOM_STEP = 0.2;
 
-            // Funkce pro aplikování transformací
             function applyTransform() {
                 mapWrapper.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
             }
 
-            // Funkce pro zoom In
             zoomInBtn.addEventListener('click', () => {
                 currentScale = Math.min(currentScale + ZOOM_STEP, MAX_SCALE);
                 applyTransform();
             });
 
-            // Funkce pro zoom Out
             zoomOutBtn.addEventListener('click', () => {
                 currentScale = Math.max(currentScale - ZOOM_STEP, MIN_SCALE);
-                // Když se zmenšuje, posun se může dostat mimo mapu, je potřeba ho resetovat
+                // Při zmenšení na původní velikost resetujeme posuv
                 if (currentScale === MIN_SCALE) {
                     currentX = 0;
                     currentY = 0;
@@ -387,7 +383,6 @@
                 applyTransform();
             });
 
-            // Funkce pro reset zoomu a posuvu
             resetZoomBtn.addEventListener('click', () => {
                 currentScale = MIN_SCALE;
                 currentX = 0;
@@ -395,9 +390,9 @@
                 applyTransform();
             });
 
-            // Logika pro posouvání (panování)
+            // Logika pro posouvání (panování) - myš
             mapContainer.addEventListener('mousedown', (e) => {
-                if (currentScale > MIN_SCALE) { // Povolit panování pouze při zoomu
+                if (currentScale > MIN_SCALE) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
                     startX = e.clientX - currentX;
@@ -417,34 +412,29 @@
 
             mapContainer.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
-                e.preventDefault(); // Zamezí výběru textu/prvků při tažení
+                e.preventDefault();
                 currentX = e.clientX - startX;
                 currentY = e.clientY - startY;
 
-                // Omezení posuvu, aby mapa nezmizela z dohledu
-                const mapWidth = mapContainer.offsetWidth * currentScale;
-                const mapHeight = mapContainer.offsetHeight * currentScale;
-                const containerWidth = mapContainer.offsetWidth;
-                const containerHeight = mapContainer.offsetHeight;
+                // Nové limity pro posuv mapy
+                const maxPanX = (mapContainer.offsetWidth * currentScale - mapContainer.offsetWidth);
+                const maxPanY = (mapContainer.offsetHeight * currentScale - mapContainer.offsetHeight);
 
-                const maxX = (mapWidth - containerWidth) / (2 * currentScale);
-                const maxY = (mapHeight - containerHeight) / (2 * currentScale);
-
-                currentX = Math.max(Math.min(currentX, maxX), -maxX);
-                currentY = Math.max(Math.min(currentY, maxY), -maxY);
+                currentX = Math.max(Math.min(currentX, 0), -maxPanX);
+                currentY = Math.max(Math.min(currentY, 0), -maxPanY);
                 
                 applyTransform();
             });
 
             // Podpora dotykových zařízení pro posouvání
             mapContainer.addEventListener('touchstart', (e) => {
-                if (currentScale > MIN_SCALE && e.touches.length === 1) { // Povolit panování pouze při zoomu a jedním prstem
+                if (currentScale > MIN_SCALE && e.touches.length === 1) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
                     startX = e.touches[0].clientX - currentX;
                     startY = e.touches[0].clientY - currentY;
                 }
-            }, { passive: false }); // passive: false pro preventDefault
+            }, { passive: false });
 
             mapContainer.addEventListener('touchend', () => {
                 isDragging = false;
@@ -458,24 +448,19 @@
 
             mapContainer.addEventListener('touchmove', (e) => {
                 if (!isDragging || e.touches.length !== 1) return;
-                e.preventDefault(); // Zamezí posouvání stránky při tažení mapy
+                e.preventDefault();
                 currentX = e.touches[0].clientX - startX;
                 currentY = e.touches[0].clientY - startY;
 
-                // Omezení posuvu, stejné jako pro myš
-                const mapWidth = mapContainer.offsetWidth * currentScale;
-                const mapHeight = mapContainer.offsetHeight * currentScale;
-                const containerWidth = mapContainer.offsetWidth;
-                const containerHeight = mapContainer.offsetHeight;
+                // Nové limity pro posuv mapy
+                const maxPanX = (mapContainer.offsetWidth * currentScale - mapContainer.offsetWidth);
+                const maxPanY = (mapContainer.offsetHeight * currentScale - mapContainer.offsetHeight);
 
-                const maxX = (mapWidth - containerWidth) / (2 * currentScale);
-                const maxY = (mapHeight - containerHeight) / (2 * currentScale);
-
-                currentX = Math.max(Math.min(currentX, maxX), -maxX);
-                currentY = Math.max(Math.min(currentY, maxY), -maxY);
+                currentX = Math.max(Math.min(currentX, 0), -maxPanX);
+                currentY = Math.max(Math.min(currentY, 0), -maxPanY);
 
                 applyTransform();
-            }, { passive: false }); // passive: false pro preventDefault
+            }, { passive: false });
 
 
             // Nastavení počátečního stavu nadpisu
