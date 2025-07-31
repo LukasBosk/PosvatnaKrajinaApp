@@ -6,9 +6,17 @@
     <title>Mapa - depoty, sídliště, pohřebiště</title>
     <meta name="theme-color" content="#4285f4"/>
     <style>
+        /* ZMĚNY ZDE: HTML a BODY pro plnou výšku a flexbox */
+        html, body {
+            height: 100%; /* Důležité: html i body musí mít 100% výšku */
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Zamezí scrollování celého dokumentu, pokud se obsah roztáhne */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            margin: 0;
             padding: 20px;
             background-image: url('./pozadi.jpg');
             background-size: cover;
@@ -16,11 +24,9 @@
             background-position: center center;
             color: #333;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Vertikální rozložení: header, wrapper, footer (pokud je) */
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-            position: relative;
+            box-sizing: border-box; /* Včetně paddingu do výpočtu výšky */
         }
 
         .header {
@@ -30,6 +36,7 @@
             margin-bottom: 20px;
             flex-wrap: wrap;
             text-align: center;
+            flex-shrink: 0; /* Zabrání zmenšování headeru */
         }
         .header img {
             height: 60px;
@@ -50,21 +57,6 @@
             }
         }
 
-        .map-and-controls-wrapper {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            width: 100%;
-            max-width: 1200px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            /* ZMĚNA: Odstraněna pevná výška pro malé obrazovky odsud */
-        }
-
         .map-heading {
             width: 100%;
             text-align: center;
@@ -77,23 +69,43 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin-bottom: 20px;
             box-sizing: border-box;
+            flex-shrink: 0; /* Zabrání zmenšování nadpisu */
         }
         
+        /* ZMĚNY ZDE: map-and-controls-wrapper vyplní zbývající výšku */
+        .map-and-controls-wrapper {
+            display: flex;
+            flex-direction: row; /* Na desktopu zůstane řada */
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            flex-grow: 1; /* Důležité: vyplní dostupnou vertikální výšku */
+            height: 0; /* Klíčové pro flex-grow v kontejneru s výchozí výškou */
+            overflow: hidden; /* Skryje obsah, který by mohl přesáhnout, ale necháme primární overflow na map-containeru */
+        }
+
+        /* ZMĚNY ZDE: map-container nyní bere 100% výšky rodiče */
         .map-container {
             position: relative;
             flex-grow: 1;
             min-width: 280px;
-            overflow: hidden;
+            overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
             display: block;
-            height: auto;
-            /* ZMĚNA: Přidáno pro obecné omezení výšky na větších obrazovkách */
-            max-height: 85vh; /* Povolí mapě zabrat většinu výšky obrazovky */
+            height: 100%; /* Důležité: zabere 100% výšky z .map-and-controls-wrapper */
+            /* max-height odstraněno, protože výška je řízena flexboxem rodiče */
         }
         .map-container.panning {
             cursor: grabbing;
         }
 
+        /* ZMĚNY ZDE: map-wrapper se škáluje a posouvá */
         .map-wrapper {
             position: absolute;
             top: 0;
@@ -103,13 +115,14 @@
             will-change: transform;
         }
 
+        /* ZMĚNY ZDE: obrázky vyplní map-wrapper */
         .map-base, .map-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: contain; /* Zajišťuje, že se obrázky nedeformují */
             user-select: none;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -239,14 +252,13 @@
                 font-size: 1.1em;
             }
 
+            /* ZMĚNY ZDE: map-and-controls-wrapper pro mobily */
             .map-and-controls-wrapper {
-                flex-direction: column;
+                flex-direction: column; /* Na mobilech se přepne na sloupec */
                 padding: 10px;
                 gap: 15px;
-                /* ZMĚNA: Odstraněny rigidní výškové limity odsud */
-                /* height: calc(100vh - 150px); */
-                /* max-height: calc(100vh - 100px); */
-                overflow: visible; /* Ponecháme overflow:visible pro tento wrapper, overflow bude na map-containeru */
+                height: auto; /* Povolí výšku dle obsahu pro column flow */
+                overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
             }
 
             .map-heading {
@@ -254,21 +266,32 @@
                 margin-bottom: 15px;
             }
 
+            /* ZMĚNY ZDE: map-container pro mobily */
             .map-container {
                 width: 100%;
                 min-width: unset;
-                /* ZMĚNA: Nové, flexibilnější omezení výšky pro mobily, zohledňující header a tlačítka */
-                max-height: calc(100vh - 100px - 80px); /* Odhad: 100px pro header/nadpis, 80px pro tlačítka dole */
-                /* Alternativně můžete experimentovat s pevnou výškou v px/rem nebo čistě vh, pokud toto nepomůže */
-                min-height: 200px; /* Aby mapa nebyla úplně tenká */
+                /* ZMĚNA: Přidáno explicitní omezení výšky pro map-container na mobilech,
+                   aby se vešel na obrazovku, zejména na ležato.
+                   Výpočet je "celá výška viewportu mínus výška headeru/nadpisu a tlačítek" */
+                height: calc(100vh - (var(--header-height) + var(--heading-height) + var(--buttons-height) + 40px)); /* 40px pro paddingy */
+                min-height: 200px; /* Aby nebyla příliš malá */
                 box-sizing: border-box;
             }
+
+            /* CSS proměnné pro dynamické výpočty výšek */
+            body {
+                --header-height: 70px; /* Odhadnutá výška headeru */
+                --heading-height: 50px; /* Odhadnutá výška nadpisu */
+                --buttons-height: 100px; /* Odhadnutá výška ovládacích tlačítek */
+            }
+            /* Upravte tyto hodnoty na základě skutečných výšek na vašem zařízení */
             
             .button-controls {
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: center;
                 min-width: auto;
+                flex-shrink: 0; /* Zabrání zmenšování tlačítek */
             }
 
             .map-button {
