@@ -99,7 +99,7 @@
             width: 100%;
             height: 100%;
             transform-origin: 0 0; /* Důležité pro konzistentní transformace */
-            transition: transform 0.05s ease-out; /* Plynulejší zoom */
+            transition: transform 0.05s ease-out; /* Plynulejší zoom - bude vypnuto při dragu */
             will-change: transform; /* Optimalizace pro plynulé animace */
         }
 
@@ -368,6 +368,9 @@
             const MAX_SCALE = 4;
             const ZOOM_STEP = 0.2;
 
+            // Uložíme si původní hodnotu transition, abychom ji mohli obnovit
+            const defaultTransition = mapWrapper.style.transition;
+
             function applyTransform() {
                 mapWrapper.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
             }
@@ -399,6 +402,8 @@
                 if (currentScale > MIN_SCALE) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
+                    mapWrapper.style.transition = 'none'; // Vypnout animaci během tažení
+
                     initialClientX = e.clientX;
                     initialClientY = e.clientY;
                     initialMapX = currentX;
@@ -409,11 +414,13 @@
             mapContainer.addEventListener('mouseup', () => {
                 isDragging = false;
                 mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition; // Obnovit animaci
             });
 
             mapContainer.addEventListener('mouseleave', () => {
                 isDragging = false;
                 mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition; // Obnovit animaci
             });
 
             mapContainer.addEventListener('mousemove', (e) => {
@@ -424,22 +431,36 @@
                 let newX = initialMapX + (e.clientX - initialClientX);
                 let newY = initialMapY + (e.clientY - initialClientY);
 
-                // Omezení posuvu ( clamped value between min and max )
+                // Omezení posuvu
                 const scaledWidth = mapContainer.offsetWidth * currentScale;
                 const scaledHeight = mapContainer.offsetHeight * currentScale;
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Min/Max hodnoty pro currentX
+                // Max/Min hodnoty pro currentX (pravý okraj mapy je na okraji kontejneru)
                 const minX = -(scaledWidth - containerWidth);
-                const maxX = 0;
+                const maxX = 0; // Levý okraj mapy je na okraji kontejneru
                 
-                // Min/Max hodnoty pro currentY
+                // Max/Min hodnoty pro currentY (dolní okraj mapy je na okraji kontejneru)
                 const minY = -(scaledHeight - containerHeight);
-                const maxY = 0;
+                const maxY = 0; // Horní okraj mapy je na okraji kontejneru
 
-                currentX = Math.min(Math.max(newX, minX), maxX);
-                currentY = Math.min(Math.max(newY, minY), maxY);
+                // Aplikujeme omezení
+                if (newX > maxX) {
+                    currentX = maxX;
+                } else if (newX < minX) {
+                    currentX = minX;
+                } else {
+                    currentX = newX;
+                }
+                
+                if (newY > maxY) {
+                    currentY = maxY;
+                } else if (newY < minY) {
+                    currentY = minY;
+                } else {
+                    currentY = newY;
+                }
                 
                 applyTransform();
             });
@@ -449,6 +470,8 @@
                 if (currentScale > MIN_SCALE && e.touches.length === 1) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
+                    mapWrapper.style.transition = 'none'; // Vypnout animaci během tažení
+
                     initialClientX = e.touches[0].clientX;
                     initialClientY = e.touches[0].clientY;
                     initialMapX = currentX;
@@ -459,11 +482,13 @@
             mapContainer.addEventListener('touchend', () => {
                 isDragging = false;
                 mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition; // Obnovit animaci
             });
 
             mapContainer.addEventListener('touchcancel', () => {
                 isDragging = false;
                 mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition; // Obnovit animaci
             });
 
             mapContainer.addEventListener('touchmove', (e) => {
@@ -485,8 +510,22 @@
                 const minY = -(scaledHeight - containerHeight);
                 const maxY = 0;
 
-                currentX = Math.min(Math.max(newX, minX), maxX);
-                currentY = Math.min(Math.max(newY, minY), maxY);
+                // Aplikujeme omezení
+                if (newX > maxX) {
+                    currentX = maxX;
+                } else if (newX < minX) {
+                    currentX = minX;
+                } else {
+                    currentX = newX;
+                }
+                
+                if (newY > maxY) {
+                    currentY = maxY;
+                } else if (newY < minY) {
+                    currentY = minY;
+                } else {
+                    currentY = newY;
+                }
 
                 applyTransform();
             }, { passive: false });
