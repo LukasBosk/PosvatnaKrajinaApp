@@ -20,7 +20,7 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            overflow: hidden;
+            /* overflow: hidden; */ /* Odebráno, aby se zabránilo ořezání obsahu na menších obrazovkách */
             position: relative;
         }
 
@@ -37,7 +37,7 @@
             margin-right: 15px;
         }
         .header h1 {
-            color: white; /* Opraveno zpět na bílou */
+            color: white;
             font-size: 1.35em;
             margin: 0;
         }
@@ -51,16 +51,44 @@
             }
         }
 
-        /* Kontejner pro mapu a ovládání */
-        .map-container {
-            position: relative;
+        /* Nový wrapper pro mapu a ovládací prvky */
+        .map-and-controls-wrapper {
+            display: flex;
+            flex-direction: row; /* Default pro desktop: mapa vlevo, tlačítka vpravo */
+            gap: 20px;
             width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 1682 / 1144; /* Použití poměru stran obrázku prazdna.jpeg */
+            max-width: 1200px; /* Větší max-width pro celý kontejner */
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 20px; /* Vnitřní odsazení kontejneru */
             box-sizing: border-box;
+            position: relative; /* Pro relativní pozicování nadpisu h2 */
+        }
+
+        /* Nadpis nad mapou - Nyní již není absolutně pozicovaný uvnitř mapy */
+        .map-heading {
+            width: 100%; /* Bude zabírat celou šířku kontejneru wrapperu */
+            text-align: center;
+            color: black;
+            font-size: 1.5em;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.8); /* Lehce průhledné pozadí */
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 20px; /* Mezera mezi nadpisem a mapou/tlačítky */
+            box-sizing: border-box; /* Zahrnout padding do šířky */
+            /* Na malých obrazovkách to bude uvnitř map-and-controls-wrapper */
+            /* Ale teď je to mimo map-container, takže nebude překrývat */
+        }
+        
+        /* Kontejner pro mapu */
+        .map-container {
+            position: relative;
+            flex-grow: 1; /* Mapa zabere co nejvíce místa */
+            aspect-ratio: 1682 / 1144; /* Zachová poměr stran obrázku prazdna.jpeg */
+            min-width: 280px; /* Minimální šířka mapy */
         }
 
         .map-wrapper {
@@ -89,33 +117,14 @@
             opacity: 1;
         }
         
-        /* Nadpis nad mapou - nyní s rámečkem */
-        .map-heading {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            color: black;
-            font-size: 1.5em;
-            font-weight: bold;
-            /* Přidány styly pro rámeček */
-            background-color: rgba(255, 255, 255, 0.5); /* Částečně průhledné bílé pozadí */
-            padding: 8px 15px; /* Odsazení pro text */
-            border-radius: 8px; /* Zaoblené rohy */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Stín */
-            white-space: nowrap; /* Zabrání zalomení textu */
-        }
-
-        /* Kontejner pro tlačítka */
-        .button-overlay {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        /* Kontejner pro tlačítka - přejmenován z button-overlay */
+        .button-controls {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Pro desktop: tlačítka pod sebou */
             gap: 10px;
             z-index: 20;
+            flex-shrink: 0; /* Zabraňuje smršťování tlačítek */
+            min-width: 150px; /* Minimální šířka pro tlačítka na desktopu */
         }
 
         .map-button {
@@ -128,6 +137,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            white-space: nowrap; /* Zabrání zalomení textu tlačítka */
         }
 
         .map-button:hover {
@@ -168,6 +178,63 @@
             transform: translateY(0);
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
+
+        /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony) */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px; /* Menší padding na těle */
+            }
+            .header {
+                margin-bottom: 15px;
+            }
+            .header h1 {
+                font-size: 1.1em; /* Menší nadpis na mobilu */
+            }
+
+            .map-and-controls-wrapper {
+                flex-direction: column; /* Tlačítka se přesunou pod mapu */
+                padding: 10px; /* Menší padding pro wrapper */
+                gap: 15px; /* Mezera mezi mapou a tlačítky */
+                height: auto; /* Výška se přizpůsobí obsahu */
+            }
+
+            .map-heading {
+                font-size: 1.2em; /* Menší nadpis nad mapou */
+                margin-bottom: 15px;
+            }
+
+            .map-container {
+                width: 100%; /* Mapa zabere celou šířku */
+                max-width: none; /* Odstraníme max-width, aby se přizpůsobila */
+            }
+
+            .button-controls {
+                flex-direction: row; /* Tlačítka vedle sebe */
+                flex-wrap: wrap; /* Povolí zalomení tlačítek do více řádků */
+                justify-content: center; /* Vycentrování tlačítek */
+                min-width: auto; /* Odstraníme minimální šířku pro tlačítka */
+            }
+
+            .map-button {
+                flex: 1 1 auto; /* Tlačítka se roztáhnou a zalomí */
+                max-width: calc(50% - 10px); /* Dvě tlačítka na řádek s mezerou */
+                font-size: 0.9em;
+                padding: 8px 10px;
+            }
+            /* Úprava pro případný 3. nebo 4. tlačítko, aby se nalomilo správně */
+            @media (max-width: 480px) {
+                .map-button {
+                    max-width: calc(100% - 10px); /* Jedno tlačítko na řádek na velmi malých obrazovkách */
+                }
+            }
+
+            .back-button {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -176,19 +243,25 @@
         <h1>Mapa - depoty, sídliště, pohřebiště</h1>
     </div>
 
-    <div class="map-container">
-        <h2 class="map-heading" id="mapHeading">Depoty</h2>
-        <div class="map-wrapper">
-            <img src="./prazdna.jpg" alt="Základní mapa" class="map-base">
-            <img src="./depoty-body.png" alt="Body depoty" class="map-overlay active" data-target="depoty">
-            <img src="./sidliste-body.png" alt="Body sídliště" class="map-overlay" data-target="sidliste">
-            <img src="./pohrebiste-body.png" alt="Body pohřebiště" class="map-overlay" data-target="pohrebiste">
-            <img src="./hradiste-body.png" alt="Body hradiště" class="map-overlay" data-target="hradiste"> </div>
-        <div class="button-overlay">
+    <h2 class="map-heading" id="mapHeading">Depoty</h2>
+
+    <div class="map-and-controls-wrapper">
+        <div class="map-container">
+            <div class="map-wrapper">
+                <img src="./prazdna.jpeg" alt="Základní mapa" class="map-base">
+                <img src="./depoty-body.png" alt="Body depoty" class="map-overlay active" data-target="depoty">
+                <img src="./sidliste-body.png" alt="Body sídliště" class="map-overlay" data-target="sidliste">
+                <img src="./pohrebiste-body.png" alt="Body pohřebiště" class="map-overlay" data-target="pohrebiste">
+                <img src="./hradiste-body.png" alt="Body hradiště" class="map-overlay" data-target="hradiste">
+            </div>
+        </div>
+        
+        <div class="button-controls">
             <button class="map-button active" data-target="depoty">Depoty</button>
             <button class="map-button" data-target="sidliste">Sídliště</button>
             <button class="map-button" data-target="pohrebiste">Pohřebiště</button>
-            <button class="map-button" data-target="hradiste">Hradiště</button> </div>
+            <button class="map-button" data-target="hradiste">Hradiště</button>
+        </div>
     </div>
 
     <a href="./index.html" class="back-button">Zpět</a>
@@ -198,6 +271,14 @@
             const buttons = document.querySelectorAll('.map-button');
             const overlays = document.querySelectorAll('.map-overlay');
             const mapHeading = document.getElementById('mapHeading');
+
+            // Nastavení počátečního stavu pro mobilní zařízení (pokud je první spuštění na mobilu)
+            // Při DOMContentLoaded nastavíme nadpis podle defaultně aktivního tlačítka
+            const initialActiveButton = document.querySelector('.map-button.active');
+            if (initialActiveButton) {
+                mapHeading.textContent = initialActiveButton.textContent;
+            }
+
 
             buttons.forEach(button => {
                 button.addEventListener('click', () => {
