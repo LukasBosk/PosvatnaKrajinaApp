@@ -432,20 +432,22 @@
                 let newY = initialMapY + (e.clientY - initialClientY);
 
                 // Omezení posuvu
-                const scaledWidth = mapContainer.offsetWidth * currentScale;
-                const scaledHeight = mapContainer.offsetHeight * currentScale;
+                const scaledContentWidth = mapContainer.offsetWidth * currentScale;
+                const scaledContentHeight = mapContainer.offsetHeight * currentScale;
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Max/Min hodnoty pro currentX (pravý okraj mapy je na okraji kontejneru)
-                const minX = -(scaledWidth - containerWidth);
-                const maxX = 0; // Levý okraj mapy je na okraji kontejneru
+                // Maximální povolený posun doprava (levý okraj mapy na levém okraji kontejneru)
+                const maxX = 0; 
+                // Maximální povolený posun doleva (pravý okraj mapy na pravém okraji kontejneru)
+                const minX = containerWidth - scaledContentWidth;
                 
-                // Max/Min hodnoty pro currentY (dolní okraj mapy je na okraji kontejneru)
-                const minY = -(scaledHeight - containerHeight);
-                const maxY = 0; // Horní okraj mapy je na okraji kontejneru
+                // Maximální povolený posun dolů (horní okraj mapy na horním okraji kontejneru)
+                const maxY = 0; 
+                // Maximální povolený posun nahoru (dolní okraj mapy na dolním okraji kontejneru)
+                const minY = containerHeight - scaledContentHeight;
 
-                // Aplikujeme omezení
+                // Aplikujeme omezení pro X
                 if (newX > maxX) {
                     currentX = maxX;
                 } else if (newX < minX) {
@@ -454,6 +456,7 @@
                     currentX = newX;
                 }
                 
+                // Aplikujeme omezení pro Y
                 if (newY > maxY) {
                     currentY = maxY;
                 } else if (newY < minY) {
@@ -499,18 +502,18 @@
                 let newY = initialMapY + (e.touches[0].clientY - initialClientY);
 
                 // Omezení posuvu (stejné jako pro myš)
-                const scaledWidth = mapContainer.offsetWidth * currentScale;
-                const scaledHeight = mapContainer.offsetHeight * currentScale;
+                const scaledContentWidth = mapContainer.offsetWidth * currentScale;
+                const scaledContentHeight = mapContainer.offsetHeight * currentScale;
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                const minX = -(scaledWidth - containerWidth);
-                const maxX = 0;
+                const maxX = 0; 
+                const minX = containerWidth - scaledContentWidth;
                 
-                const minY = -(scaledHeight - containerHeight);
-                const maxY = 0;
+                const maxY = 0; 
+                const minY = containerHeight - scaledContentHeight;
 
-                // Aplikujeme omezení
+                // Aplikujeme omezení pro X
                 if (newX > maxX) {
                     currentX = maxX;
                 } else if (newX < minX) {
@@ -519,6 +522,7 @@
                     currentX = newX;
                 }
                 
+                // Aplikujeme omezení pro Y
                 if (newY > maxY) {
                     currentY = maxY;
                 } else if (newY < minY) {
