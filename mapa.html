@@ -10,7 +10,7 @@
             height: 100%;
             width: 100%;
             margin: 0;
-            padding: 0; /* ÚPLNĚ ODSTRANĚN padding z body */
+            padding: 0;
             overflow: hidden; /* Zamezí scrollování celého dokumentu */
         }
 
@@ -22,7 +22,7 @@
             background-position: center center;
             color: #333;
             display: flex;
-            flex-direction: column; /* Uspořádá děti vertikálně */
+            flex-direction: column; /* Uspořádá děti vertikálně: header, nadpis, sekce mapy, tlačítko zpět */
             align-items: center; /* Horizontálně vycentruje obsah */
             justify-content: flex-start; /* Zarovná obsah na začátek vertikálně */
             box-sizing: border-box; /* Včetně paddingu do výpočtu výšky */
@@ -33,14 +33,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px; /* Desktop */
+            margin-bottom: 20px; /* Mezera pod headerem */
             flex-wrap: wrap;
             text-align: center;
             flex-shrink: 0; /* Zabrání zmenšování headeru */
-            padding: 20px 10px 0; /* Přidán padding nahoře a po stranách, jelikož je odstraněn z body */
+            padding: 20px 10px 0; /* Padding nahoře a po stranách, jelikož je odstraněn z body */
             width: 100%; /* Ujistí se, že zabírá plnou šířku pro centrování */
             max-width: 1200px; /* Omezení šířky pro desktop */
-            box-sizing: border-box; /* Důležité pro padding */
+            box-sizing: border-box;
         }
         .header img {
             height: 60px;
@@ -54,16 +54,16 @@
         @media (max-width: 600px) {
             .header {
                 flex-direction: column;
-                margin-bottom: 5px; /* Sníženo pro mobil */
-                padding: 10px 5px 0; /* Sníženo pro mobil */
+                margin-bottom: 5px;
+                padding: 10px 5px 0;
             }
             .header img {
                 margin-right: 0;
-                margin-bottom: 5px; /* Sníženo pro mobil */
-                height: 50px; /* Trochu zmenšeno pro mobil */
+                margin-bottom: 5px;
+                height: 50px;
             }
             .header h1 {
-                font-size: 0.9em; /* Zmenšeno pro mobil */
+                font-size: 0.9em;
             }
         }
 
@@ -77,38 +77,38 @@
             padding: 10px 15px; /* Desktop */
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 20px; /* Desktop */
+            margin-bottom: 20px; /* Mezera pod nadpisem */
             box-sizing: border-box;
             flex-shrink: 0; /* Zabrání zmenšování nadpisu */
             max-width: 1200px; /* Omezení šířky pro desktop */
         }
         
-        /* Nový hlavní kontejner pro mapu a ovladače */
-        .main-content-area {
+        /* NOVÝ HLAVNÍ KONTEJNER pro uspořádání zoom, mapa, kategorie */
+        .map-and-controls-section {
             display: flex;
-            flex-direction: row; /* Desktop: zoom | mapa | kategorie */
+            flex-direction: row; /* Desktop: zoom (vlevo) | mapa (uprostřed) | kategorie (vpravo) */
             gap: 15px; /* Mezera mezi sloupci */
             width: 100%;
             max-width: 1200px;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            padding: 20px; /* Vnitřní padding wrapperu */
+            padding: 20px; /* Vnitřní padding celého bloku */
             box-sizing: border-box;
             flex-grow: 1; /* Vyplní dostupnou vertikální výšku */
             height: 0; /* Důležité pro flex-grow v kontejneru s výchozí výškou */
             overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
-            margin-bottom: 20px; /* Mezera dole */
+            margin-bottom: 20px; /* Mezera dole pod celou sekcí */
         }
 
         .map-container {
             position: relative;
-            flex: 1 1 0; /* Mapa zabere veškerý dostupný prostor */
+            flex: 1 1 0; /* Mapa zabere veškerý dostupný prostor ve flex kontejneru */
             min-width: 280px;
-            min-height: 200px; /* Minimální výška, aby se kontejner nesložil */
+            min-height: 200px; /* Minimální výška mapy, aby se nesložila */
             overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
-            display: block;
+            display: block; /* Důležité pro nastavení výšky/šířky */
         }
         .map-container.panning {
             cursor: grabbing;
@@ -122,6 +122,8 @@
             transition: transform 0.05s ease-out;
             will-change: transform;
             z-index: 10;
+            width: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou šířku kontejneru */
+            height: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou výšku kontejneru */
         }
 
         .map-base, .map-overlay {
@@ -130,7 +132,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: contain; /* Zajišťuje, že se obrázky nedeformují */
             user-select: none;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -145,11 +147,11 @@
         
         .button-controls {
             display: flex;
-            flex-direction: column; /* Tlačítka vertikálně na desktopu */
+            flex-direction: column; /* Tlačítka kategorií vertikálně na desktopu */
             gap: 10px;
             z-index: 20;
             flex-shrink: 0; /* Zabrání zmenšování tlačítek */
-            min-width: 120px; /* Minimální šířka pro tlačítka */
+            min-width: 120px; /* Minimální šířka pro tlačítka kategorií */
         }
 
         .map-button {
@@ -162,7 +164,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            white-space: nowrap; /* Desktop */
+            white-space: nowrap; /* Desktop - zamezí zalamování textu */
             text-align: center;
         }
 
@@ -177,7 +179,7 @@
         }
 
         .zoom-controls {
-            /* ODSTRANĚNO position: absolute */
+            /* ODSTRANĚNO position: absolute - nyní je součástí flex flow */
             display: flex;
             flex-direction: column; /* Desktop: tlačítka zoomu vertikálně */
             gap: 8px;
@@ -220,7 +222,7 @@
         }
         
         .back-button {
-            position: fixed; /* Zůstává fixed */
+            position: fixed; /* Zůstává fixed, aby neovlivňoval layout */
             bottom: 20px; /* Desktop */
             right: 20px; /* Desktop */
             background-color: rgba(255, 255, 255, 0.9);
@@ -247,7 +249,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony) */
+        /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony a tablety na výšku) */
         @media (max-width: 768px) {
             .header {
                 margin-bottom: 5px;
@@ -266,7 +268,7 @@
                 padding: 6px 8px;
             }
 
-            .main-content-area { /* Místo map-and-controls-wrapper */
+            .map-and-controls-section {
                 flex-direction: column; /* Na mobilech se přepne na sloupec: mapa | kategorie | zoom */
                 padding: 8px;
                 gap: 8px;
@@ -278,7 +280,7 @@
             }
             
             .button-controls {
-                flex-direction: row; /* Tlačítka horizontálně na mobilech */
+                flex-direction: row; /* Tlačítka kategorií horizontálně na mobilech */
                 flex-wrap: wrap;
                 justify-content: center;
                 min-width: unset;
@@ -299,7 +301,7 @@
             }
 
             .zoom-controls {
-                flex-direction: row; /* ZMĚNA: Tlačítka zoomu horizontálně na mobilu */
+                flex-direction: row; /* Tlačítka zoomu horizontálně na mobilu */
                 justify-content: center; /* Vycentrovat je horizontálně */
                 padding: 8px;
                 gap: 5px;
@@ -331,7 +333,7 @@
 
     <h2 class="map-heading" id="mapHeading">Depoty</h2>
 
-    <div class="main-content-area">
+    <div class="map-and-controls-section">
         <div class="zoom-controls">
             <button class="zoom-button" id="zoomInBtn">+</button>
             <button class="zoom-button" id="zoomOutBtn">-</button>
