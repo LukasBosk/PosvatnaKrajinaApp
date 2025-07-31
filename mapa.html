@@ -107,7 +107,7 @@
             background-color: rgba(255,255,255,0.75);
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.11);
-            border: 1.5px solid #e0e0e0; /* jemný rámeček */
+            border: 1.5px solid #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -142,6 +142,10 @@
         }
         .map-overlay.active {
             opacity: 1;
+        }
+        /* Pro "Vše" – overlay má třídu .all-active */
+        .map-overlay.all-active {
+            opacity: 1 !important;
         }
 
         .controls-column {
@@ -195,6 +199,10 @@
             background-color: rgba(66, 133, 244, 1);
             box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(66, 133, 244, 0.6);
         }
+        .map-button.all-active {
+            background-color: #388e3c;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #388e3c80;
+        }
 
         .zoom-controls {
             display: flex;
@@ -202,7 +210,7 @@
             gap: 9px;
             width: 100%;
             align-items: center;
-            margin-top: 34px; /* na desktopu posunutí dolů */
+            margin-top: 34px;
         }
 
         .zoom-button, .reset-button {
@@ -285,17 +293,18 @@
                 padding: 10px 5vw 10px 5vw;
                 flex-direction: row;
                 align-items: flex-start;
-                justify-content: center;
+                justify-content: flex-start; /* NE ke středu! */
                 gap: 0;
                 border-radius: 10px;
             }
             .button-controls {
                 flex-direction: row;
                 flex-wrap: wrap;
-                gap: 5px;
-                width: 70vw;
-                justify-content: center; /* na mobilu zarovnat ke středu */
+                gap: 7px;
+                width: auto;
+                justify-content: flex-start; /* Mírně doprava */
                 align-items: center;
+                margin-left: 25px; /* mírně doprava */
             }
             .map-button {
                 flex: 1 1 auto;
@@ -339,10 +348,11 @@
             .button-controls {
                 flex-direction: row;
                 flex-wrap: wrap;
-                gap: 4px;
+                gap: 6px;
                 width: 100vw;
-                justify-content: center;
+                justify-content: flex-start; /* mírně doprava */
                 align-items: center;
+                margin-left: 18px; /* mírně doprava */
             }
             .map-button {
                 font-size: 0.8em;
@@ -383,6 +393,7 @@
                 <button class="map-button" data-target="sidliste">Sídliště</button>
                 <button class="map-button" data-target="pohrebiste">Pohřebiště</button>
                 <button class="map-button" data-target="hradiste">Hradiště</button>
+                <button class="map-button" data-target="all" id="allBtn">Vše</button>
             </div>
 
             <div class="zoom-controls">
@@ -400,6 +411,7 @@
             const buttons = document.querySelectorAll('.map-button');
             const overlays = document.querySelectorAll('.map-overlay');
             const mapHeading = document.getElementById('mapHeading');
+            const allBtn = document.getElementById('allBtn');
             
             const mapContainer = document.getElementById('mapContainer');
             const mapWrapper = document.getElementById('mapWrapper');
@@ -582,6 +594,33 @@
                 applyTransform();
             }, { passive: false });
 
+            // Přepínání vrstev podle zvoleného bodu
+            function setActiveOverlay(target) {
+                overlays.forEach(overlay => {
+                    overlay.classList.remove('active', 'all-active');
+                });
+                buttons.forEach(btn => {
+                    btn.classList.remove('active', 'all-active');
+                });
+
+                if (target === 'all') {
+                    // Aktivuj všechny vrstvy
+                    overlays.forEach(overlay => {
+                        overlay.classList.add('all-active');
+                    });
+                    allBtn.classList.add('all-active');
+                    mapHeading.textContent = 'Vše';
+                } else {
+                    const button = document.querySelector(`.map-button[data-target="${target}"]`);
+                    if (button) button.classList.add('active');
+                    const activeOverlay = document.querySelector(`.map-overlay[data-target="${target}"]`);
+                    if (activeOverlay) activeOverlay.classList.add('active');
+                    mapHeading.textContent = button ? button.textContent : '';
+                }
+                resetZoomBtn.click();
+            }
+
+            // Výchozí nadpis
             const initialActiveButton = document.querySelector('.map-button.active');
             if (initialActiveButton) {
                 mapHeading.textContent = initialActiveButton.textContent;
@@ -589,19 +628,11 @@
 
             buttons.forEach(button => {
                 button.addEventListener('click', () => {
-                    const target = button.dataset.target;
-                    buttons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    overlays.forEach(overlay => overlay.classList.remove('active'));
-                    const activeOverlay = document.querySelector(`.map-overlay[data-target="${target}"]`);
-                    if (activeOverlay) {
-                        activeOverlay.classList.add('active');
-                    }
-                    mapHeading.textContent = button.textContent;
-                    resetZoomBtn.click();
+                    setActiveOverlay(button.dataset.target);
                 });
             });
 
+            // Události pro resize okna a načtení základní mapy
             window.addEventListener('resize', resizeMap);
             baseMapImage.onload = resizeMap;
             if (baseMapImage.complete) {
