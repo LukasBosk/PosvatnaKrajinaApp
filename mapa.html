@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#4285f4"/>
     <style>
         html, body {
-            height: 100%;
+            height: 100%; /* Zajišťuje, že body zabírá celou výšku viewportu */
             width: 100%;
             margin: 0;
             padding: 0;
@@ -22,11 +22,13 @@
             background-position: center center;
             color: #333;
             display: flex;
-            flex-direction: column; /* Uspořádá děti vertikálně: header, nadpis, sekce mapy, tlačítko zpět */
+            flex-direction: column; /* Uspořádá děti vertikálně: header, mapa, tlačítko zpět */
             align-items: center; /* Horizontálně vycentruje obsah */
             justify-content: flex-start; /* Zarovná obsah na začátek vertikálně */
             box-sizing: border-box; /* Včetně paddingu do výpočtu výšky */
             min-height: 100vh; /* Zajistí, že body má minimálně výšku celého viewportu */
+            padding-top: 20px; /* Přidán padding nahoře pro header, který již není součástí flex flow */
+            padding-bottom: 20px; /* Přidán padding dole pro back-button */
         }
 
         .header {
@@ -37,10 +39,10 @@
             flex-wrap: wrap;
             text-align: center;
             flex-shrink: 0; /* Zabrání zmenšování headeru */
-            padding: 20px 10px 0; /* Padding nahoře a po stranách, jelikož je odstraněn z body */
-            width: 100%; /* Ujistí se, že zabírá plnou šířku pro centrování */
+            width: 100%;
             max-width: 1200px; /* Omezení šířky pro desktop */
             box-sizing: border-box;
+            padding: 0 10px; /* Padding po stranách pro lepší vzhled */
         }
         .header img {
             height: 60px;
@@ -55,7 +57,7 @@
             .header {
                 flex-direction: column;
                 margin-bottom: 5px;
-                padding: 10px 5px 0;
+                padding: 0 5px;
             }
             .header img {
                 margin-right: 0;
@@ -67,63 +69,36 @@
             }
         }
 
-        .map-heading {
-            width: 100%;
-            text-align: center;
-            color: black;
-            font-size: 1.5em;
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px 15px; /* Desktop */
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin-bottom: 20px; /* Mezera pod nadpisem */
-            box-sizing: border-box;
-            flex-shrink: 0; /* Zabrání zmenšování nadpisu */
-            max-width: 1200px; /* Omezení šířky pro desktop */
-        }
-        
-        /* Hlavní kontejner pro mapu a ovladače kategorií */
-        .map-and-controls-wrapper {
-            display: flex;
-            flex-direction: row; /* Desktop: mapa (vlevo) | kategorie (vpravo) */
-            gap: 15px; /* Mezera mezi mapou a tlačítky */
-            width: 100%;
-            max-width: 1200px;
+        /* Kontejner pro mapu a ovládání - nyní hlavní flex položka */
+        .map-container {
+            position: relative;
+            width: calc(100% - 40px); /* Odstraní padding body */
+            max-width: 1200px; /* Stejná šířka jako header pro konzistenci */
+            /* Použití aspect-ratio z vaší verze, ale s fallbackem pro šířku a výšku */
+            aspect-ratio: 1682 / 1144; 
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            padding: 20px; /* Vnitřní padding celého bloku */
             box-sizing: border-box;
-            flex-grow: 1; /* Vyplní dostupnou vertikální výšku */
-            height: 0; /* Důležité pro flex-grow v kontejneru s výchozí výškou */
-            overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
-            margin-bottom: 20px; /* Mezera dole pod celou sekcí */
+            overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
+            cursor: grab;
+            flex-grow: 1; /* Zajistí, že mapa zabere dostupný prostor */
+            margin-bottom: 20px; /* Mezera pod mapou */
         }
-
-        .map-container {
-            position: relative;
-            flex: 1; /* Mapa zabere veškerý dostupný prostor ve flex kontejneru */
-            min-width: 280px;
-            min-height: 200px; /* Minimální výška mapy, aby se nesložila */
-            overflow: hidden; /* Důležité pro oříznutí */
-            /* cursor: grab; odstraněno */
-            display: block; /* Důležité pro nastavení výšky/šířky */
-        }
-        /* .map-container.panning { odstraněno
+        .map-container.panning {
             cursor: grabbing;
-        } */
+        }
 
         .map-wrapper {
-            position: absolute;
+            position: absolute; /* Ponecháno absolutní pro zoom a pan */
             top: 0;
             left: 0;
-            width: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou šířku kontejneru */
-            height: 100%; /* Zajišťuje, že map-wrapper se roztáhne na celou výšku kontejneru */
-            /* transform-origin: 0 0; odstraněno */
-            /* transition: transform 0.05s ease-out; odstraněno */
-            /* will-change: transform; odstraněno */
+            transform-origin: 0 0; /* Důležité pro zoom */
+            transition: transform 0.05s ease-out;
+            will-change: transform;
             z-index: 10;
+            width: 100%;
+            height: 100%;
         }
 
         .map-base, .map-overlay {
@@ -132,7 +107,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Zajišťuje, že se obrázky nedeformují */
+            object-fit: contain; /* Zajistí, že se obrázky nedeformují */
             user-select: none;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -145,13 +120,33 @@
             opacity: 1;
         }
         
-        .button-controls {
+        /* Nadpis nad mapou - nyní uvnitř map-container */
+        .map-heading {
+            position: absolute;
+            top: 20px; /* Mezera odshora */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: black;
+            font-size: 1.5em;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            box-sizing: border-box;
+        }
+
+        /* Kontejner pro tlačítka kategorií - uvnitř map-container */
+        .button-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
             display: flex;
-            flex-direction: column; /* Tlačítka kategorií vertikálně na desktopu */
+            flex-direction: column;
             gap: 10px;
             z-index: 20;
-            flex-shrink: 0; /* Zabrání zmenšování tlačítek */
-            min-width: 120px; /* Minimální šířka pro tlačítka kategorií */
         }
 
         .map-button {
@@ -164,7 +159,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            white-space: nowrap; /* Desktop - zamezí zalamování textu */
+            white-space: nowrap; /* Zabrání zalamování textu na desktopu */
             text-align: center;
         }
 
@@ -178,12 +173,55 @@
             box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(66, 133, 244, 1);
         }
 
-        /* .zoom-controls { odstraněno */
-        /* Styly pro zoom ovládání jsou odstraněny */
-        /* } */
+        /* Kontejner pro tlačítka zoomu - uvnitř map-container */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column; /* Vertikálně na desktopu */
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 20;
+        }
+
+        .zoom-button, .reset-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: #1a73e8;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .zoom-button:hover, .reset-button:hover {
+            background-color: #0f4a7b;
+            transform: scale(1.05);
+        }
+        .zoom-button:active, .reset-button:active {
+            transform: scale(1);
+        }
+        .reset-button {
+            font-size: 0.9em;
+            border-radius: 8px;
+            width: auto;
+            padding: 0 10px;
+            height: 35px;
+        }
         
+        /* Styl pro tlačítko Zpět */
         .back-button {
-            position: fixed; /* Zůstává fixed, aby neovlivňoval layout */
+            position: fixed; /* Zůstává fixed, aby neovlivňoval layout mapy */
             bottom: 20px; /* Desktop */
             right: 20px; /* Desktop */
             background-color: rgba(255, 255, 255, 0.9);
@@ -212,9 +250,13 @@
 
         /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony a tablety na výšku) */
         @media (max-width: 768px) {
+            body {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
             .header {
                 margin-bottom: 5px;
-                padding: 10px 5px 0;
+                padding: 0 5px;
             }
             .header h1 {
                 font-size: 0.9em;
@@ -223,47 +265,50 @@
                 height: 40px;
             }
 
+            .map-container {
+                width: calc(100% - 16px); /* Zmenšený padding pro menší obrazovky */
+                min-height: 150px; /* Snížena min-height pro mobil */
+                margin-bottom: 10px;
+            }
+
             .map-heading {
+                top: 10px; /* Menší mezera odshora */
                 font-size: 1em;
-                margin-bottom: 8px;
                 padding: 6px 8px;
             }
-
-            .map-and-controls-wrapper {
-                flex-direction: column; /* Na mobilech se přepne na sloupec: mapa | kategorie */
-                padding: 8px;
-                gap: 8px;
-                margin-bottom: 8px;
-            }
-
-            .map-container {
-                min-height: 150px; /* Snížena min-height pro mobil */
-            }
             
-            .button-controls {
-                flex-direction: row; /* Tlačítka kategorií horizontálně na mobilech */
-                flex-wrap: wrap;
-                justify-content: center;
-                min-width: unset;
+            .button-overlay {
+                top: 10px;
+                right: 10px;
                 gap: 5px;
             }
 
             .map-button {
-                flex: 1 1 auto;
-                max-width: calc(50% - 2.5px); /* Udrženo pro dva sloupce */
-                font-size: 0.7em;
                 padding: 5px 8px;
+                font-size: 0.7em;
                 white-space: normal; /* Povolí zalamování textu */
             }
-            @media (max-width: 400px) { /* Ještě menší telefony */
-                .map-button {
-                    max-width: 100%; /* Na nejmenších obrazovkách zabere celou šířku */
-                }
+
+            .zoom-controls {
+                bottom: 10px;
+                left: 10px;
+                flex-direction: row; /* Tlačítka zoomu horizontálně na mobilu */
+                padding: 8px;
+                gap: 5px;
             }
-            
+            .zoom-button, .reset-button {
+                width: 32px;
+                height: 32px;
+                font-size: 1.1em;
+            }
+            .reset-button {
+                padding: 0 8px;
+                height: 32px;
+            }
+
             .back-button {
-                bottom: 8px;
-                right: 8px;
+                bottom: 10px;
+                right: 10px;
                 padding: 8px 12px;
                 font-size: 0.9em;
             }
@@ -276,24 +321,27 @@
         <h1>Mapa - depoty, sídliště, pohřebiště</h1>
     </div>
 
-    <h2 class="map-heading" id="mapHeading">Depoty</h2>
-
-    <div class="map-and-controls-wrapper">
-        <div class="map-container" id="mapContainer">
-            <div class="map-wrapper" id="mapWrapper">
-                <img src="./prazdna.jpg" alt="Základní mapa" class="map-base">
-                <img src="./depoty-body.png" alt="Body depoty" class="map-overlay active" data-target="depoty">
-                <img src="./sidliste-body.png" alt="Body sídliště" class="map-overlay" data-target="sidliste">
-                <img src="./pohrebiste-body.png" alt="Body pohrebiste" class="map-overlay" data-target="pohrebiste">
-                <img src="./hradiste-body.png" alt="Body hradiště" class="map-overlay" data-target="hradiste">
-            </div>
+    <div class="map-container" id="mapContainer">
+        <h2 class="map-heading" id="mapHeading">Depoty</h2>
+        <div class="map-wrapper" id="mapWrapper">
+            <img src="./prazdna.jpg" alt="Základní mapa" class="map-base">
+            <img src="./depoty-body.png" alt="Body depoty" class="map-overlay active" data-target="depoty">
+            <img src="./sidliste-body.png" alt="Body sídliště" class="map-overlay" data-target="sidliste">
+            <img src="./pohrebiste-body.png" alt="Body pohrebiste" class="map-overlay" data-target="pohrebiste">
+            <img src="./hradiste-body.png" alt="Body hradiště" class="map-overlay" data-target="hradiste">
         </div>
         
-        <div class="button-controls">
+        <div class="button-overlay">
             <button class="map-button active" data-target="depoty">Depoty</button>
             <button class="map-button" data-target="sidliste">Sídliště</button>
             <button class="map-button" data-target="pohrebiste">Pohřebiště</button>
             <button class="map-button" data-target="hradiste">Hradiště</button>
+        </div>
+
+        <div class="zoom-controls">
+            <button class="zoom-button" id="zoomInBtn">+</button>
+            <button class="zoom-button" id="zoomOutBtn">-</button>
+            <button class="reset-button" id="resetZoomBtn">Reset</button>
         </div>
     </div>
 
@@ -307,40 +355,197 @@
             
             const mapContainer = document.getElementById('mapContainer');
             const mapWrapper = document.getElementById('mapWrapper');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
             const baseMapImage = document.querySelector('.map-base');
 
-            // Odstraněny proměnné pro zoom a pan
+            // Intrinsic rozměry mapy z reference userem dodaného mapa.html
+            const MAP_INTRINSIC_WIDTH = 1682; 
+            const MAP_INTRINSIC_HEIGHT = 1144;
 
-            // Funkce pro nastavení velikosti mapy v kontejneru
+            let initialScale = 1;
+            let currentScale = 1;
+            let currentX = 0;
+            let currentY = 0;
+            let isDragging = false;
+            let initialClientX, initialClientY;
+            let initialMapX, initialMapY;
+
+            const ZOOM_STEP = 0.2;
+            const MAX_ZOOM_FACTOR = 4;
+            const MIN_ZOOM_FACTOR = 1;
+
+            const defaultTransition = mapWrapper.style.transition;
+
+            function applyTransform() {
+                const totalScale = initialScale * currentScale;
+                mapWrapper.style.transform = `scale(${totalScale}) translate(${currentX}px, ${currentY}px)`;
+            }
+
+            function clampPan() {
+                const totalScale = initialScale * currentScale;
+                const scaledMapWidth = MAP_INTRINSIC_WIDTH * totalScale;
+                const scaledMapHeight = MAP_INTRINSIC_HEIGHT * totalScale;
+
+                const containerWidth = mapContainer.offsetWidth;
+                const containerHeight = mapContainer.offsetHeight;
+
+                // Spočítáme minimální a maximální posun pro x a y
+                // Cílem je, aby okraje mapy nikdy nešly za okraje kontejneru
+                let minX = (containerWidth - scaledMapWidth) / totalScale;
+                let maxX = 0;
+                if (scaledMapWidth < containerWidth) { // Pokud je mapa menší než kontejner, vycentrujeme ji
+                    minX = (containerWidth - scaledMapWidth) / (2 * totalScale);
+                    maxX = (containerWidth - scaledMapWidth) / (2 * totalScale);
+                }
+                
+                let minY = (containerHeight - scaledMapHeight) / totalScale;
+                let maxY = 0;
+                if (scaledMapHeight < containerHeight) { // Pokud je mapa menší než kontejner, vycentrujeme ji
+                    minY = (containerHeight - scaledMapHeight) / (2 * totalScale);
+                    maxY = (containerHeight - scaledMapHeight) / (2 * totalScale);
+                }
+                
+                currentX = Math.max(Math.min(currentX, maxX), minX);
+                currentY = Math.max(Math.min(currentY, maxY), minY);
+            }
+
             function resizeMap() {
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Určíme měřítko tak, aby se mapa vešla do kontejneru bez deformace
-                const MAP_INTRINSIC_WIDTH = baseMapImage.naturalWidth || 2770; // Použijeme skutečnou šířku obrázku, nebo fallback
-                const MAP_INTRINSIC_HEIGHT = baseMapImage.naturalHeight || 2910; // Použijeme skutečnou výšku obrázku, nebo fallback
-                
+                // Vypočítáme initialScale na základě toho, jak se vejde do kontejneru
+                // Použijeme MAP_INTRINSIC_WIDTH a MAP_INTRINSIC_HEIGHT
                 const scaleX = containerWidth / MAP_INTRINSIC_WIDTH;
                 const scaleY = containerHeight / MAP_INTRINSIC_HEIGHT;
                 
-                const scale = Math.min(scaleX, scaleY);
+                initialScale = Math.min(scaleX, scaleY);
 
-                // Nastavíme velikost map-wrapperu podle vypočítaného měřítka
-                mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH * scale}px`;
-                mapWrapper.style.height = `${MAP_INTRINSIC_HEIGHT * scale}px`;
+                // Nastavíme šířku a výšku map-wrapperu na vnitřní rozměry obrázku
+                // aby se scaling aplikoval na původní velikost
+                mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH}px`;
+                mapWrapper.style.height = `${MAP_INTRINSIC_HEIGHT}px`;
 
-                // Vycentrujeme mapu uvnitř kontejneru
-                const offsetX = (containerWidth - (MAP_INTRINSIC_WIDTH * scale)) / 2;
-                const offsetY = (containerHeight - (MAP_INTRINSIC_HEIGHT * scale)) / 2;
-                mapWrapper.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-
+                // Zajistíme, že se všechny vrstvy roztáhnou na 100% wrapperu
                 overlays.forEach(img => {
                     img.style.width = '100%';
                     img.style.height = '100%';
                 });
                 baseMapImage.style.width = '100%';
                 baseMapImage.style.height = '100%';
+
+                // Reset zoomu a pozice, aby se mapa při resize vešla a byla uprostřed
+                currentScale = MIN_ZOOM_FACTOR;
+                currentX = 0;
+                currentY = 0;
+                
+                clampPan(); // Zajistí, že je mapa správně vycentrována
+                applyTransform();
             }
+
+            zoomInBtn.addEventListener('click', () => {
+                const oldScale = currentScale;
+                currentScale = Math.min(currentScale + ZOOM_STEP, MAX_ZOOM_FACTOR);
+                const factor = currentScale / oldScale;
+                // Přepočítání pozice pro "zoom k centru"
+                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
+                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
+                clampPan();
+                applyTransform();
+            });
+
+            zoomOutBtn.addEventListener('click', () => {
+                const oldScale = currentScale;
+                currentScale = Math.max(currentScale - ZOOM_STEP, MIN_ZOOM_FACTOR);
+                const factor = currentScale / oldScale;
+                // Přepočítání pozice pro "zoom k centru"
+                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
+                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
+                clampPan();
+                applyTransform();
+                if (currentScale === MIN_ZOOM_FACTOR) {
+                    resetZoomBtn.click(); // Reset na výchozí pozici při minimálním zoomu
+                }
+            });
+
+            resetZoomBtn.addEventListener('click', () => {
+                currentScale = MIN_ZOOM_FACTOR;
+                currentX = 0;
+                currentY = 0;
+                clampPan();
+                applyTransform();
+            });
+
+            // Dotykové a myší události pro panování
+            mapContainer.addEventListener('mousedown', (e) => {
+                if (currentScale > MIN_ZOOM_FACTOR) {
+                    isDragging = true;
+                    mapContainer.classList.add('panning');
+                    mapWrapper.style.transition = 'none'; // Vypne animaci při posouvání
+
+                    initialClientX = e.clientX;
+                    initialClientY = e.clientY;
+                    initialMapX = currentX;
+                    initialMapY = currentY;
+                }
+            });
+
+            mapContainer.addEventListener('mouseup', () => {
+                isDragging = false;
+                mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition; // Znovu zapne animaci
+            });
+
+            mapContainer.addEventListener('mouseleave', () => {
+                isDragging = false;
+                mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition;
+            });
+
+            mapContainer.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                currentX = initialMapX + (e.clientX - initialClientX) / (initialScale * currentScale);
+                currentY = initialMapY + (e.clientY - initialClientY) / (initialScale * currentScale);
+                clampPan();
+                applyTransform();
+            });
+
+            mapContainer.addEventListener('touchstart', (e) => {
+                if (currentScale > MIN_ZOOM_FACTOR && e.touches.length === 1) {
+                    isDragging = true;
+                    mapContainer.classList.add('panning');
+                    mapWrapper.style.transition = 'none';
+
+                    initialClientX = e.touches[0].clientX;
+                    initialClientY = e.touches[0].clientY;
+                    initialMapX = currentX;
+                    initialMapY = currentY;
+                }
+            }, { passive: false });
+
+            mapContainer.addEventListener('touchend', () => {
+                isDragging = false;
+                mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition;
+            });
+
+            mapContainer.addEventListener('touchcancel', () => {
+                isDragging = false;
+                mapContainer.classList.remove('panning');
+                mapWrapper.style.transition = defaultTransition;
+            });
+
+            mapContainer.addEventListener('touchmove', (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+                e.preventDefault();
+                currentX = initialMapX + (e.touches[0].clientX - initialClientX) / (initialScale * currentScale);
+                currentY = initialMapY + (e.touches[0].clientY - initialClientY) / (initialScale * currentScale);
+                clampPan();
+                applyTransform();
+            }, { passive: false });
+
 
             const initialActiveButton = document.querySelector('.map-button.active');
             if (initialActiveButton) {
@@ -358,15 +563,14 @@
                         activeOverlay.classList.add('active');
                     }
                     mapHeading.textContent = button.textContent;
-                    // Po změně kategorie znovu zarovnáme mapu na střed
-                    resizeMap(); 
+                    resetZoomBtn.click(); // Reset zoom po změně kategorie, aby se mapa vrátila do výchozího stavu
                 });
             });
 
-            // Přesunuto sem, aby se mapa správně inicializovala
+            // Události pro resize okna a načtení základní mapy
             window.addEventListener('resize', resizeMap);
-            baseMapImage.onload = resizeMap; // Zajistí, že se mapa nastaví po načtení obrázku
-            if (baseMapImage.complete) { // Pokud už je obrázek načtený
+            baseMapImage.onload = resizeMap;
+            if (baseMapImage.complete) {
                 resizeMap();
             }
         });
