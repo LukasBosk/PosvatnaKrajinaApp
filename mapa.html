@@ -7,16 +7,15 @@
     <meta name="theme-color" content="#4285f4"/>
     <style>
         html, body {
-            height: 100%;
+            height: 100%; /* Zajistí, že html a body vyplní celou výšku viewportu */
             width: 100%;
             margin: 0;
-            padding: 0;
+            padding: 0; /* ÚPLNĚ ODSTRANĚN padding z body */
             overflow: hidden; /* Zamezí scrollování celého dokumentu */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            padding: 20px; /* Okraje kolem celého obsahu - desktop */
             background-image: url('./pozadi.jpg');
             background-size: cover;
             background-attachment: fixed;
@@ -24,8 +23,10 @@
             color: #333;
             display: flex;
             flex-direction: column; /* Uspořádá děti vertikálně */
-            align-items: center;
+            align-items: center; /* Horizontálně vycentruje obsah */
+            justify-content: flex-start; /* ZAROVNÁNÍ NAHOREK, ABY MAPA MOHLA RŮST DOLŮ */
             box-sizing: border-box; /* Včetně paddingu do výpočtu výšky */
+            min-height: 100vh; /* Zajistí, že body má minimálně výšku celého viewportu */
         }
 
         .header {
@@ -36,6 +37,10 @@
             flex-wrap: wrap;
             text-align: center;
             flex-shrink: 0; /* Zabrání zmenšování headeru */
+            padding: 20px 10px 0; /* Přidán padding nahoře a po stranách, jelikož je odstraněn z body */
+            width: 100%; /* Ujistí se, že zabírá plnou šířku pro centrování */
+            max-width: 1200px; /* Omezení šířky pro desktop */
+            box-sizing: border-box; /* Důležité pro padding */
         }
         .header img {
             height: 60px;
@@ -49,10 +54,16 @@
         @media (max-width: 600px) {
             .header {
                 flex-direction: column;
+                margin-bottom: 5px; /* Sníženo pro mobil */
+                padding: 10px 5px 0; /* Sníženo pro mobil */
             }
             .header img {
                 margin-right: 0;
-                margin-bottom: 10px;
+                margin-bottom: 5px; /* Sníženo pro mobil */
+                height: 50px; /* Trochu zmenšeno pro mobil */
+            }
+            .header h1 {
+                font-size: 0.9em; /* Zmenšeno pro mobil */
             }
         }
 
@@ -69,12 +80,13 @@
             margin-bottom: 20px; /* Desktop */
             box-sizing: border-box;
             flex-shrink: 0; /* Zabrání zmenšování nadpisu */
+            max-width: 1200px; /* Omezení šířky pro desktop */
         }
         
         .map-and-controls-wrapper {
             display: flex;
             flex-direction: row; /* Na desktopu zůstane řada (mapa vlevo, tlačítka vpravo) */
-            gap: 20px; /* Desktop */
+            gap: 15px; /* ZMĚNA: Snížen gap pro desktop z 20px na 15px */
             width: 100%;
             max-width: 1200px;
             background-color: rgba(255, 255, 255, 0.7);
@@ -86,17 +98,18 @@
             flex-grow: 1; /* Důležité: vyplní dostupnou vertikální výšku */
             height: 0; /* Klíčové pro flex-grow v kontejneru s výchozí výškou */
             overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
+            margin-bottom: 20px; /* Přidán margin dole pro desktop, nahrazuje padding na body */
         }
 
         .map-container {
             position: relative;
-            flex-grow: 1; /* Mapa zabere veškerý dostupný prostor v rámci wrapperu */
+            flex: 1 1 0; /* ZMĚNA: flex shorthand pro mapu, aby zabrala max. prostor */
             min-width: 280px;
             min-height: 200px; /* Minimální výška, aby se kontejner nesložil */
             overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
-            display: block;
-            height: 100%; /* Zabere 100% výšky rodiče (.map-and-controls-wrapper) */
+            display: block; /* Důležité pro nastavení výšky/šířky */
+            /* height: 100%; - toto bude řízeno 'flex: 1 1 0' v column i row */
         }
         .map-container.panning {
             cursor: grabbing;
@@ -136,8 +149,9 @@
             flex-direction: column; /* Tlačítka vertikálně na desktopu */
             gap: 10px;
             z-index: 20;
-            flex-shrink: 0;
-            min-width: 150px;
+            flex-shrink: 0; /* Zabrání zmenšování tlačítek */
+            min-width: 120px; /* ZMĚNA: Zmenšen min-width pro tlačítka */
+            /* flex-grow: 0; */ /* Explicitně nastaveno, aby si nebraly zbytečný prostor */
         }
 
         .map-button {
@@ -151,6 +165,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
             white-space: nowrap; /* Desktop */
+            text-align: center; /* Pro jistotu */
         }
 
         .map-button:hover {
@@ -209,9 +224,9 @@
         }
         
         .back-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            position: fixed; /* Zůstává fixed */
+            bottom: 20px; /* Desktop */
+            right: 20px; /* Desktop */
             background-color: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             color: #1a73e8;
@@ -238,81 +253,82 @@
 
         /* MEDIA QUERIES pro optimalizaci na malých obrazovkách (telefony) */
         @media (max-width: 768px) {
-            body {
-                padding: 0px; /* ZMĚNA: Sníženo z 5px na 0px */
-            }
             .header {
-                margin-bottom: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
+                margin-bottom: 5px; /* Sníženo */
+                padding: 10px 5px 0; /* Sníženo */
             }
             .header h1 {
-                font-size: 0.95em; /* ZMĚNA: Mírně zmenšen font pro více místa */
+                font-size: 0.9em; /* Zmenšeno */
             }
+            .header img {
+                height: 40px; /* Zmenšeno */
+            }
+
 
             .map-and-controls-wrapper {
                 flex-direction: column; /* Na mobilech se přepne na sloupec */
-                padding: 5px; /* ZMĚNA: Sníženo z 8px na 5px */
-                gap: 5px; /* ZMĚNA: Sníženo z 8px na 5px */
-                height: auto; /* Povolí výšku dle obsahu pro column flow */
-                overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
+                padding: 8px; /* ZMĚNA: Vráceno na 8px */
+                gap: 8px; /* ZMĚNA: Vráceno na 8px */
+                margin-bottom: 8px; /* ZMĚNA: Vráceno na 8px */
             }
 
             .map-heading {
-                font-size: 1.05em; /* ZMĚNA: Mírně zmenšen font pro více místa */
-                margin-bottom: 5px; /* ZMĚNA: Sníženo z 8px na 5px */
-                padding: 5px 6px; /* ZMĚNA: Mírně zmenšen padding */
+                font-size: 1em; /* Zmenšeno */
+                margin-bottom: 8px; /* ZMĚNA: Vráceno na 8px */
+                padding: 6px 8px; /* ZMĚNA: Vráceno */
             }
 
             .map-container {
                 width: 100%;
                 min-width: unset;
-                flex-grow: 1; /* Zaujme co nejvíce místa v rámci .map-and-controls-wrapper */
-                height: 0; /* Potřeba pro správnou funkci flex-grow v column layoutu */
-                box-sizing: border-box;
+                flex: 1 1 0; /* Zajišťuje, že mapa v column layoutu zabere max. prostor */
+                min-height: 150px; /* ZMĚNA: Snížena min-height pro mobil */
             }
             
             .button-controls {
                 flex-direction: row; /* Tlačítka horizontálně na mobilech */
                 flex-wrap: wrap;
                 justify-content: center;
-                min-width: auto;
-                flex-shrink: 0;
-                gap: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
+                min-width: unset; /* ZMĚNA: Uvolněno min-width */
+                gap: 5px; /* ZMĚNA: Vráceno na 5px */
+                /* Odstraněno flex-shrink: 0, protože na mobilu nechceme, aby tlačítka zabírala více místa */
             }
 
             .map-button {
-                flex: 1 1 auto;
-                max-width: calc(50% - 1.5px); /* ZMĚNA: Upraveno pro nový gap 3px */
-                font-size: 0.75em; /* ZMĚNA: Mírně zmenšen font */
-                padding: 4px 6px; /* ZMĚNA: Mírně zmenšen padding */
-                white-space: normal; /* ZMĚNA: Povolí zalamování textu */
+                flex: 1 1 auto; /* Umožní flexibilní rozdělení šířky */
+                max-width: calc(50% - 2.5px); /* Udrženo pro dva sloupce */
+                font-size: 0.7em; /* ZMĚNA: Sníženo */
+                padding: 5px 8px; /* ZMĚNA: Vráceno */
+                white-space: normal; /* Povolí zalamování textu */
             }
-            @media (max-width: 480px) {
+            @media (max-width: 400px) { /* Ještě menší telefony */
                 .map-button {
                     max-width: 100%; /* Na nejmenších obrazovkách zabere celou šířku */
                 }
             }
 
+
             .zoom-controls {
-                bottom: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
-                left: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
-                padding: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
-                gap: 2px; /* ZMĚNA: Sníženo z 3px na 2px */
+                bottom: 8px; /* ZMĚNA: Vráceno na 8px */
+                left: 8px; /* ZMĚNA: Vráceno na 8px */
+                padding: 8px; /* ZMĚNA: Vráceno na 8px */
+                gap: 5px; /* ZMĚNA: Vráceno na 5px */
             }
             .zoom-button, .reset-button {
-                width: 24px; /* ZMĚNA: Sníženo z 28px na 24px */
-                height: 24px; /* ZMĚNA: Sníženo z 28px na 24px */
-                font-size: 0.9em; /* ZMĚNA: Mírně zmenšen font */
+                width: 32px; /* ZMĚNA: Zvětšeno pro lepší použitelnost */
+                height: 32px; /* ZMĚNA: Zvětšeno */
+                font-size: 1.1em; /* Zvětšeno */
             }
             .reset-button {
-                padding: 0 4px; /* ZMĚNA: Mírně zmenšen padding */
-                height: 24px; /* ZMĚNA: Upraveno podle výšky tlačítek zoomu */
+                padding: 0 8px; /* ZMĚNA: Vráceno */
+                height: 32px; /* ZMĚNA: Upraveno */
             }
 
             .back-button {
-                bottom: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
-                right: 3px; /* ZMĚNA: Sníženo z 5px na 3px */
-                padding: 4px 6px; /* ZMĚNA: Mírně zmenšen padding */
-                font-size: 0.8em; /* ZMĚNA: Mírně zmenšen font */
+                bottom: 8px; /* ZMĚNA: Vráceno na 8px */
+                right: 8px; /* ZMĚNA: Vráceno na 8px */
+                padding: 8px 12px; /* ZMĚNA: Vráceno */
+                font-size: 0.9em; /* Zvětšeno */
             }
         }
     </style>
