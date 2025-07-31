@@ -433,8 +433,9 @@
                 const scaleX = containerWidth / MAP_INTRINSIC_WIDTH;
                 const scaleY = containerHeight / MAP_INTRINSIC_HEIGHT;
                 
-                // initialScale bude nejmenší z obou měřítek, aby se mapa vešla do obou dimenzí
-                initialScale = Math.min(scaleX, scaleY);
+                // ZMĚNA: initialScale nyní použije Math.max, aby se mapa roztáhla co nejvíce
+                // i když to znamená, že část mapy bude zpočátku mimo zobrazení
+                initialScale = Math.max(scaleX, scaleY);
 
                 // Nastavíme rozměry map-wrapperu na původní rozměry mapy (nebudeme je škálovat CSS)
                 // Škálujeme to celkově pomocí transform: scale
