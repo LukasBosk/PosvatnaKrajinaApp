@@ -82,7 +82,7 @@
         
         /* Kontejner pro mapu */
         .map-container {
-            position: relative;
+            position: relative; /* DŮLEŽITÉ: Nyní je kontext pro zoom-controls */
             flex-grow: 1;
             aspect-ratio: 1682 / 1144;
             min-width: 280px;
@@ -156,9 +156,9 @@
             box-shadow: 0 0 0 3px #fff, 0 0 0 5px rgba(66, 133, 244, 1);
         }
 
-        /* Ovládací prvky zoomu */
+        /* Ovládací prvky zoomu - nyní pozicované vzhledem k map-container */
         .zoom-controls {
-            position: absolute;
+            position: absolute; /* DŮLEŽITÉ */
             bottom: 20px;
             left: 20px;
             z-index: 30;
@@ -279,10 +279,13 @@
                 }
             }
 
+            /* Na mobilu se ovládací prvky zoomu stále pozicují vzhledem k map-container,
+               ale můžete je přesunout na jinou pozici, pokud je to potřeba.
+               Zde jsou ponechány vlevo dole, ale s menším odsazením. */
             .zoom-controls {
                 bottom: 10px;
                 left: 10px;
-                flex-direction: row;
+                flex-direction: row; /* Tlačítka vedle sebe na mobilu */
                 padding: 8px;
                 gap: 5px;
             }
@@ -324,6 +327,12 @@
                 <img src="./pohrebiste-body.png" alt="Body pohřebiště" class="map-overlay" data-target="pohrebiste">
                 <img src="./hradiste-body.png" alt="Body hradiště" class="map-overlay" data-target="hradiste">
             </div>
+
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomInBtn">+</button>
+                <button class="zoom-button" id="zoomOutBtn">-</button>
+                <button class="reset-button" id="resetZoomBtn">Reset</button>
+            </div>
         </div>
         
         <div class="button-controls">
@@ -331,12 +340,6 @@
             <button class="map-button" data-target="sidliste">Sídliště</button>
             <button class="map-button" data-target="pohrebiste">Pohřebiště</button>
             <button class="map-button" data-target="hradiste">Hradiště</button>
-        </div>
-
-        <div class="zoom-controls">
-            <button class="zoom-button" id="zoomInBtn">+</button>
-            <button class="zoom-button" id="zoomOutBtn">-</button>
-            <button class="reset-button" id="resetZoomBtn">Reset</button>
         </div>
     </div>
 
@@ -421,24 +424,22 @@
                 let newX = initialMapX + (e.clientX - initialClientX);
                 let newY = initialMapY + (e.clientY - initialClientY);
 
-                // Omezení posuvu
+                // Omezení posuvu ( clamped value between min and max )
                 const scaledWidth = mapContainer.offsetWidth * currentScale;
                 const scaledHeight = mapContainer.offsetHeight * currentScale;
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Max posun doleva (currentX <= 0)
-                const maxLeftPan = 0;
-                // Max posun doprava (currentX >= -(scaledWidth - containerWidth))
-                const maxRightPan = -(scaledWidth - containerWidth);
+                // Min/Max hodnoty pro currentX
+                const minX = -(scaledWidth - containerWidth);
+                const maxX = 0;
                 
-                // Max posun nahoru (currentY <= 0)
-                const maxTopPan = 0;
-                // Max posun dolů (currentY >= -(scaledHeight - containerHeight))
-                const maxBottomPan = -(scaledHeight - containerHeight);
+                // Min/Max hodnoty pro currentY
+                const minY = -(scaledHeight - containerHeight);
+                const maxY = 0;
 
-                currentX = Math.max(Math.min(newX, maxLeftPan), maxRightPan);
-                currentY = Math.max(Math.min(newY, maxTopPan), maxBottomPan);
+                currentX = Math.min(Math.max(newX, minX), maxX);
+                currentY = Math.min(Math.max(newY, minY), maxY);
                 
                 applyTransform();
             });
@@ -478,14 +479,14 @@
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                const maxLeftPan = 0;
-                const maxRightPan = -(scaledWidth - containerWidth);
+                const minX = -(scaledWidth - containerWidth);
+                const maxX = 0;
                 
-                const maxTopPan = 0;
-                const maxBottomPan = -(scaledHeight - containerHeight);
+                const minY = -(scaledHeight - containerHeight);
+                const maxY = 0;
 
-                currentX = Math.max(Math.min(newX, maxLeftPan), maxRightPan);
-                currentY = Math.max(Math.min(newY, maxTopPan), maxBottomPan);
+                currentX = Math.min(Math.max(newX, minX), maxX);
+                currentY = Math.min(Math.max(newY, minY), maxY);
 
                 applyTransform();
             }, { passive: false });
