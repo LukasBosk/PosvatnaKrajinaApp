@@ -92,11 +92,11 @@
             position: relative;
             flex-grow: 1; /* Mapa zabere veškerý dostupný prostor v rámci wrapperu */
             min-width: 280px;
+            min-height: 200px; /* ZMĚNA: Přidána minimální výška, aby se kontejner nesložil */
             overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
             display: block;
             height: 100%; /* Zabere 100% výšky rodiče (.map-and-controls-wrapper) */
-            /* max-height je nyní řízena rodiči a flexboxem */
         }
         .map-container.panning {
             cursor: grabbing;
@@ -109,6 +109,7 @@
             transform-origin: 0 0;
             transition: transform 0.05s ease-out;
             will-change: transform;
+            z-index: 10; /* ZMĚNA: Přidán z-index, aby byl pod ovládacími prvky */
         }
 
         .map-base, .map-overlay {
@@ -166,7 +167,7 @@
             position: absolute;
             bottom: 20px;
             left: 20px;
-            z-index: 30;
+            z-index: 30; /* ZMĚNA: Udrženo vysoké z-index, aby bylo nad mapou */
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -253,7 +254,6 @@
                 gap: 15px;
                 height: auto; /* Povolí výšku dle obsahu pro column flow */
                 overflow: hidden; /* Skryje obsah, který by mohl přesáhnout */
-                /* Odstraněna flex-grow: 1, protože rodič (body) už má flex-direction: column */
             }
 
             .map-heading {
@@ -264,15 +264,10 @@
             .map-container {
                 width: 100%;
                 min-width: unset;
-                /* ZMĚNA: Používáme flex-grow: 1 pro map-container i na mobilu
-                   a omezujeme celkovou výšku wrapperu nebo použijeme konkrétní max-height */
                 flex-grow: 1; /* Zaujme co nejvíce místa v rámci .map-and-controls-wrapper */
                 height: 0; /* Potřeba pro správnou funkci flex-grow v column layoutu */
-                
-                /* Nové pevnější omezení výšky pro mobilní zobrazení, zejména na ležato */
-                /* Experimentujte s touto hodnotou, pokud mapa stále není optimální */
-                max-height: calc(100vh - 120px); /* 100vh mínus odhadovaná výška headeru/nadpisu/tlačítek */
-                /* min-height odstraněno, aby se umožnilo zmenšení */
+                max-height: calc(100vh - 120px); /* Omezení výšky pro mobily, aby se vešla i na ležato */
+                /* ZMĚNA: odstraněn min-height z mobilního media query, ponechán pouze globální min-height */
                 box-sizing: border-box;
             }
             
@@ -430,7 +425,6 @@
                 const scaleX = containerWidth / MAP_INTRINSIC_WIDTH;
                 const scaleY = containerHeight / MAP_INTRINSIC_HEIGHT;
                 
-                // ZMĚNA ZPĚT: Používáme Math.min, aby se mapa celá vešla do kontejneru
                 initialScale = Math.min(scaleX, scaleY);
 
                 mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH}px`;
