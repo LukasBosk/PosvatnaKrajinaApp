@@ -78,37 +78,39 @@
             box-sizing: border-box;
         }
         
-        /* ZMĚNY ZDE: Přizpůsobení map-containeru */
+        /* ZMĚNY ZDE: map-container bez aspect-ratio, velikost bude řízena rodičem a JS */
         .map-container {
             position: relative;
             flex-grow: 1; /* Dovolí kontejneru roztáhnout se */
             min-width: 280px; /* Minimální šířka */
             overflow: hidden; /* Důležité pro oříznutí při zoomu a panování */
             cursor: grab;
-            display: flex; /* Použijeme flex pro centrování mapy uvnitř */
-            justify-content: center;
-            align-items: center;
-            /* Odstraněno aspect-ratio */
+            display: block; /* Změna na block, nebudeme centrovat pomocí flex */
+            height: auto; /* Výška se přizpůsobí flexboxu a max-height */
         }
         .map-container.panning {
             cursor: grabbing;
         }
 
-
+        /* ZMĚNY ZDE: map-wrapper se škáluje a posouvá */
         .map-wrapper {
-            position: relative; /* Bude obsahovat absolutně pozicované obrázky */
-            /* Zde nebudeme mít 100% šířky/výšky, ale bude to řízeno JS */
-            transition: transform 0.05s ease-out; /* Plynulejší zoom - bude vypnuto při dragu */
-            will-change: transform;
-            /*transform-origin: 0 0;  ODSTRANĚNO - nyní budeme používat transform-origin: 50% 50% pro zoom do středu */
-        }
-
-        .map-base, .map-overlay {
-            position: absolute; /* Absolutní pozicování uvnitř map-wrapper */
+            position: absolute; /* Absolutní pozicování uvnitř map-container */
             top: 0;
             left: 0;
-            /* ZMĚNA: Nyní bude width/height nastavováno JavaScriptem na intrinsické rozměry a škálováno */
-            /* object-fit: contain; ODSTRANĚNO */
+            /* width/height budou nastaveny JS, aby držely původní poměr stran při initialScale */
+            transform-origin: 0 0; /* Klíčové: transformace z levého horního rohu */
+            transition: transform 0.05s ease-out; /* Plynulejší zoom */
+            will-change: transform;
+        }
+
+        /* ZMĚNY ZDE: obrázky vyplní map-wrapper a JS nastaví jeho rozměry */
+        .map-base, .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Vyplní celý map-wrapper */
+            height: 100%; /* Vyplní celý map-wrapper */
+            object-fit: contain; /* Zajišťuje, že se obrázky nedeformují, pokud se náhodou map-wrapper nedeformuje */
             user-select: none;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -242,7 +244,6 @@
                 flex-direction: column;
                 padding: 10px;
                 gap: 15px;
-                /* height: auto;  Odstraněno */
             }
 
             .map-heading {
@@ -250,20 +251,14 @@
                 margin-bottom: 15px;
             }
 
-            /* ZMĚNY ZDE: Přizpůsobení map-containeru pro mobily */
             .map-container {
-                width: 100%; /* Plná šířka */
-                /* Odstraněno max-width: none a max-height */
-                /* Výška bude řízena JavaScriptem na základě dostupného prostoru */
+                width: 100%;
+                min-width: unset; /* Povolíme menší min-width, pokud je potřeba */
+                /* ZMĚNY ZDE: Omezení výšky pro mobily, zejména na ležato */
+                max-height: calc(100vh - 150px); /* 100vh minus odhadovaná výška headeru a tlačítek */
+                box-sizing: border-box; /* Zajištění správného box-modelu */
             }
-            /* Pro landscape režim se map-container bude muset vejít do zbylé výšky */
-            .map-and-controls-wrapper {
-                height: calc(100vh - 150px); /* Přibližná výška pro mapu v landscape (odečteme header/footer/padding) */
-                max-height: calc(100vh - 100px); /* Bezpečný limit */
-                overflow: hidden; /* Zajišťuje oříznutí obsahu wrapperu */
-            }
-
-
+            
             .button-controls {
                 flex-direction: row;
                 flex-wrap: wrap;
@@ -356,40 +351,39 @@
             const zoomInBtn = document.getElementById('zoomInBtn');
             const zoomOutBtn = document.getElementById('zoomOutBtn');
             const resetZoomBtn = document.getElementById('resetZoomBtn');
-            
+            const baseMapImage = document.querySelector('.map-base'); // Reference na základní obrázek
+
             // Intrinsické rozměry mapy (původní rozlišení obrázku)
             const MAP_INTRINSIC_WIDTH = 2770;
             const MAP_INTRINSIC_HEIGHT = 2910;
 
-            let currentScale = 1; // Aktuální měřítko (vzhledem k výchozímu fitScale)
-            let baseScale = 1;    // Měřítko potřebné k tomu, aby se mapa vešla do kontejneru při 1x zoomu
-            let currentX = 0;
-            let currentY = 0;
+            let initialScale = 1; // Měřítko potřebné k tomu, aby se mapa vešla do kontejneru při 1x zoomu
+            let currentScale = 1; // Aktuální zoom faktor (1 = initialScale, 2 = 2 * initialScale atd.)
+            let currentX = 0; // Aktuální posuv X v pixelech (relative k map-wrapperu)
+            let currentY = 0; // Aktuální posuv Y v pixelech (relative k map-wrapperu)
             let isDragging = false;
             let initialClientX, initialClientY;
-            let initialMapX, initialMapY;
+            let initialMapX, initialMapY; // Původní posuv X/Y na začátku dragu
 
             const ZOOM_STEP = 0.2;
-            const MAX_ZOOM_FACTOR = 4; // Maximální přiblížení (např. 4x baseScale)
+            const MAX_ZOOM_FACTOR = 4; // Maximální přiblížení (např. 4x initialScale)
+            const MIN_ZOOM_FACTOR = 1; // Minimální přiblížení (zpět na initialScale)
 
             const defaultTransition = mapWrapper.style.transition;
 
             // Funkce pro nastavení transformace mapy
             function applyTransform() {
-                // Skutečné měřítko je baseScale * currentScale
-                const totalScale = baseScale * currentScale;
+                // Celkové měřítko je součin initialScale a currentScale
+                const totalScale = initialScale * currentScale;
 
                 // Aplikujeme transformaci na map-wrapper
-                // transform-origin 50% 50% (výchozí) zajišťuje, že zoom bude do středu mapy
                 mapWrapper.style.transform = `scale(${totalScale}) translate(${currentX}px, ${currentY}px)`;
-
-                // Vzhledem k tomu, že obrázky jsou uvnitř map-wrapperu a mají pevnou šířku/výšku
-                // a map-wrapper je škálován, není třeba upravovat šířku/výšku jednotlivých obrázků.
             }
 
             // Funkce pro vynucení hranic panování
             function clampPan() {
-                const totalScale = baseScale * currentScale;
+                // Skutečné rozměry mapy po aplikaci totalScale
+                const totalScale = initialScale * currentScale;
                 const scaledMapWidth = MAP_INTRINSIC_WIDTH * totalScale;
                 const scaledMapHeight = MAP_INTRINSIC_HEIGHT * totalScale;
 
@@ -397,24 +391,33 @@
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Maximální povolený posuv (levý horní roh mapy nesmí jít doprava od 0,0)
-                // A mapa musí vyplňovat celý kontejner, když je zvětšená
+                // Max/Min posuv pro X a Y. currentX/Y jsou posuny pro map-wrapper.
+                // map-wrapper je umístěn v top:0, left:0 map-containeru.
+                // Omezení zajistí, že žádná část mapy nepůjde mimo okraj kontejneru.
+                
+                // Maximální posuv doprava (kladná hodnota)
+                // Pokud je mapa menší než kontejner, vycentrujeme ji
                 let maxX = 0;
-                let maxY = 0;
-
-                // Minimální povolený posuv (pravý dolní roh mapy nesmí jít doleva od okraje kontejneru)
-                let minX = containerWidth - scaledMapWidth;
-                let minY = containerHeight - scaledMapHeight;
-
-                // Pokud je mapa menší než kontejner (při zoom out, nebo pokud se kontejner zvětší),
-                // chceme, aby byla mapa vycentrovaná a nešla panovat.
                 if (scaledMapWidth < containerWidth) {
-                    minX = (containerWidth - scaledMapWidth) / 2;
-                    maxX = (containerWidth - scaledMapWidth) / 2;
+                    maxX = (containerWidth - scaledMapWidth) / 2 / totalScale; // Dělíme totalScale, protože currentX/Y jsou pre-scale hodnoty
                 }
+
+                // Minimální posuv doleva (záporná hodnota)
+                let minX = (containerWidth - scaledMapWidth) / totalScale;
+                if (scaledMapWidth < containerWidth) {
+                    minX = (containerWidth - scaledMapWidth) / 2 / totalScale; // Vycentrování
+                }
+
+                // Maximální posuv dolů (kladná hodnota)
+                let maxY = 0;
                 if (scaledMapHeight < containerHeight) {
-                    minY = (containerHeight - scaledMapHeight) / 2;
-                    maxY = (containerHeight - scaledMapHeight) / 2;
+                    maxY = (containerHeight - scaledMapHeight) / 2 / totalScale;
+                }
+
+                // Minimální posuv nahoru (záporná hodnota)
+                let minY = (containerHeight - scaledMapHeight) / totalScale;
+                if (scaledMapHeight < containerHeight) {
+                    minY = (containerHeight - scaledMapHeight) / 2 / totalScale;
                 }
                 
                 currentX = Math.max(Math.min(currentX, maxX), minX);
@@ -426,32 +429,32 @@
                 const containerWidth = mapContainer.offsetWidth;
                 const containerHeight = mapContainer.offsetHeight;
 
-                // Vypočítáme měřítko, aby se mapa vešla do kontejneru
-                // Bereme v úvahu, že mapa je portrétní a kontejner může být landscape
+                // Vypočítáme initialScale tak, aby se mapa vešla do kontejneru
                 const scaleX = containerWidth / MAP_INTRINSIC_WIDTH;
                 const scaleY = containerHeight / MAP_INTRINSIC_HEIGHT;
                 
-                // baseScale bude nejmenší z obou měřítek, aby se mapa vešla do obou dimenzí
-                baseScale = Math.min(scaleX, scaleY);
-                
-                // Nastavíme intrinsické rozměry map-wrapperu (jeho obsah bude mít tyto rozměry)
+                // initialScale bude nejmenší z obou měřítek, aby se mapa vešla do obou dimenzí
+                initialScale = Math.min(scaleX, scaleY);
+
+                // Nastavíme rozměry map-wrapperu na původní rozměry mapy (nebudeme je škálovat CSS)
+                // Škálujeme to celkově pomocí transform: scale
                 mapWrapper.style.width = `${MAP_INTRINSIC_WIDTH}px`;
                 mapWrapper.style.height = `${MAP_INTRINSIC_HEIGHT}px`;
 
-                // Nastavíme rozměry obrázků uvnitř wrapperu na intrinsické
+                // Nastavíme rozměry obrázků uvnitř wrapperu na 100%
                 overlays.forEach(img => {
-                    img.style.width = `${MAP_INTRINSIC_WIDTH}px`;
-                    img.style.height = `${MAP_INTRINSIC_HEIGHT}px`;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
                 });
-                document.querySelector('.map-base').style.width = `${MAP_INTRINSIC_WIDTH}px`;
-                document.querySelector('.map-base').style.height = `${MAP_INTRINSIC_HEIGHT}px`;
-
+                baseMapImage.style.width = '100%';
+                baseMapImage.style.height = '100%';
 
                 // Resetujeme zoom a pozici, aby se mapa vždy přizpůsobila a vycentrovala
-                currentScale = 1;
+                currentScale = MIN_ZOOM_FACTOR; // Zpět na počáteční zoom (1x initialScale)
                 currentX = 0;
                 currentY = 0;
-                clampPan(); // Znovu vynutíme hranice, aby se mapa vycentrovala
+                
+                clampPan(); // Vynutíme hranice, aby se mapa vycentrovala
                 applyTransform();
             }
 
@@ -460,10 +463,11 @@
                 const oldScale = currentScale;
                 currentScale = Math.min(currentScale + ZOOM_STEP, MAX_ZOOM_FACTOR);
                 
-                // Při zoomu se snažíme udržet střed mapy
-                const zoomRatio = currentScale / oldScale;
-                currentX = currentX * zoomRatio;
-                currentY = currentY * zoomRatio;
+                // Při zoomu se snažíme udržet střed mapy (relativně k aktuálnímu zobrazení)
+                // Tento výpočet posunu je důležitý pro zoom do středu
+                const factor = currentScale / oldScale;
+                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
+                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
 
                 clampPan();
                 applyTransform();
@@ -471,23 +475,23 @@
 
             zoomOutBtn.addEventListener('click', () => {
                 const oldScale = currentScale;
-                currentScale = Math.max(currentScale - ZOOM_STEP, MIN_SCALE);
+                currentScale = Math.max(currentScale - ZOOM_STEP, MIN_ZOOM_FACTOR);
                 
-                // Při zoom out také udržujeme střed
-                const zoomRatio = currentScale / oldScale;
-                currentX = currentX * zoomRatio;
-                currentY = currentY * zoomRatio;
-
+                // Opět pro zoom out udržujeme střed
+                const factor = currentScale / oldScale;
+                currentX = currentX * factor - (mapContainer.offsetWidth / (initialScale * oldScale)) * (factor - 1) / 2;
+                currentY = currentY * factor - (mapContainer.offsetHeight / (initialScale * oldScale)) * (factor - 1) / 2;
+                
                 clampPan();
                 applyTransform();
 
-                if (currentScale === MIN_SCALE) {
+                if (currentScale === MIN_ZOOM_FACTOR) {
                     resetZoomBtn.click(); // Reset to default when fully zoomed out
                 }
             });
 
             resetZoomBtn.addEventListener('click', () => {
-                currentScale = MIN_SCALE;
+                currentScale = MIN_ZOOM_FACTOR;
                 currentX = 0;
                 currentY = 0;
                 clampPan(); // Vynutíme hranice, aby se mapa vycentrovala
@@ -496,7 +500,7 @@
 
             // Logika pro posouvání (panování) - myš
             mapContainer.addEventListener('mousedown', (e) => {
-                if (currentScale > MIN_SCALE) { // Povolit panování jen při zoomu
+                if (currentScale > MIN_ZOOM_FACTOR) { // Povolit panování jen při zoomu
                     isDragging = true;
                     mapContainer.classList.add('panning');
                     mapWrapper.style.transition = 'none'; // Vypnout animaci během tažení
@@ -524,8 +528,9 @@
                 if (!isDragging) return;
                 e.preventDefault();
                 
-                currentX = initialMapX + (e.clientX - initialClientX) / (baseScale * currentScale); // Dělíme škálováním, protože posouváme v "originálních" pixelech
-                currentY = initialMapY + (e.clientY - initialClientY) / (baseScale * currentScale);
+                // Vypočítáme posuv v pixelech mapy (ne obrazovky), proto dělíme celkovým měřítkem
+                currentX = initialMapX + (e.clientX - initialClientX) / (initialScale * currentScale);
+                currentY = initialMapY + (e.clientY - initialClientY) / (initialScale * currentScale);
 
                 clampPan(); // Vynutit hranice při každém posunu
                 applyTransform();
@@ -533,7 +538,7 @@
 
             // Podpora dotykových zařízení pro posouvání
             mapContainer.addEventListener('touchstart', (e) => {
-                if (currentScale > MIN_SCALE && e.touches.length === 1) {
+                if (currentScale > MIN_ZOOM_FACTOR && e.touches.length === 1) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
                     mapWrapper.style.transition = 'none'; // Vypnout animaci během tažení
@@ -561,8 +566,8 @@
                 if (!isDragging || e.touches.length !== 1) return;
                 e.preventDefault();
                 
-                currentX = initialMapX + (e.touches[0].clientX - initialClientX) / (baseScale * currentScale);
-                currentY = initialMapY + (e.touches[0].clientY - initialClientY) / (baseScale * currentScale);
+                currentX = initialMapX + (e.touches[0].clientX - initialClientX) / (initialScale * currentScale);
+                currentY = initialMapY + (e.touches[0].clientY - initialClientY) / (initialScale * currentScale);
 
                 clampPan(); // Vynutit hranice při každém posunu
                 applyTransform();
@@ -596,7 +601,12 @@
 
             // První spuštění při načtení a pak při každé změně velikosti okna
             window.addEventListener('resize', resizeMap);
-            resizeMap(); // Initial call
+            baseMapImage.onload = resizeMap; // Zajistíme, že se mapa přizpůsobí až po načtení obrázku
+            
+            // Pokud obrázek už je načtený (např. z cache), zavoláme hned
+            if (baseMapImage.complete) {
+                resizeMap();
+            }
         });
     </script>
 </body>
