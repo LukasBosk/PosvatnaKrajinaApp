@@ -358,7 +358,8 @@
             let currentX = 0;
             let currentY = 0;
             let isDragging = false;
-            let startX, startY;
+            let initialClientX, initialClientY; // Počáteční pozice kurzoru/dotyku
+            let initialMapX, initialMapY;       // Počáteční posun mapy
 
             const MIN_SCALE = 1;
             const MAX_SCALE = 4;
@@ -395,8 +396,10 @@
                 if (currentScale > MIN_SCALE) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
-                    startX = e.clientX - currentX;
-                    startY = e.clientY - currentY;
+                    initialClientX = e.clientX;
+                    initialClientY = e.clientY;
+                    initialMapX = currentX;
+                    initialMapY = currentY;
                 }
             });
 
@@ -413,15 +416,29 @@
             mapContainer.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 e.preventDefault();
-                currentX = e.clientX - startX;
-                currentY = e.clientY - startY;
+                
+                // Vypočítáme nový posun
+                let newX = initialMapX + (e.clientX - initialClientX);
+                let newY = initialMapY + (e.clientY - initialClientY);
 
-                // Nové limity pro posuv mapy
-                const maxPanX = (mapContainer.offsetWidth * currentScale - mapContainer.offsetWidth);
-                const maxPanY = (mapContainer.offsetHeight * currentScale - mapContainer.offsetHeight);
+                // Omezení posuvu
+                const scaledWidth = mapContainer.offsetWidth * currentScale;
+                const scaledHeight = mapContainer.offsetHeight * currentScale;
+                const containerWidth = mapContainer.offsetWidth;
+                const containerHeight = mapContainer.offsetHeight;
 
-                currentX = Math.max(Math.min(currentX, 0), -maxPanX);
-                currentY = Math.max(Math.min(currentY, 0), -maxPanY);
+                // Max posun doleva (currentX <= 0)
+                const maxLeftPan = 0;
+                // Max posun doprava (currentX >= -(scaledWidth - containerWidth))
+                const maxRightPan = -(scaledWidth - containerWidth);
+                
+                // Max posun nahoru (currentY <= 0)
+                const maxTopPan = 0;
+                // Max posun dolů (currentY >= -(scaledHeight - containerHeight))
+                const maxBottomPan = -(scaledHeight - containerHeight);
+
+                currentX = Math.max(Math.min(newX, maxLeftPan), maxRightPan);
+                currentY = Math.max(Math.min(newY, maxTopPan), maxBottomPan);
                 
                 applyTransform();
             });
@@ -431,8 +448,10 @@
                 if (currentScale > MIN_SCALE && e.touches.length === 1) {
                     isDragging = true;
                     mapContainer.classList.add('panning');
-                    startX = e.touches[0].clientX - currentX;
-                    startY = e.touches[0].clientY - currentY;
+                    initialClientX = e.touches[0].clientX;
+                    initialClientY = e.touches[0].clientY;
+                    initialMapX = currentX;
+                    initialMapY = currentY;
                 }
             }, { passive: false });
 
@@ -449,15 +468,24 @@
             mapContainer.addEventListener('touchmove', (e) => {
                 if (!isDragging || e.touches.length !== 1) return;
                 e.preventDefault();
-                currentX = e.touches[0].clientX - startX;
-                currentY = e.touches[0].clientY - startY;
+                
+                let newX = initialMapX + (e.touches[0].clientX - initialClientX);
+                let newY = initialMapY + (e.touches[0].clientY - initialClientY);
 
-                // Nové limity pro posuv mapy
-                const maxPanX = (mapContainer.offsetWidth * currentScale - mapContainer.offsetWidth);
-                const maxPanY = (mapContainer.offsetHeight * currentScale - mapContainer.offsetHeight);
+                // Omezení posuvu (stejné jako pro myš)
+                const scaledWidth = mapContainer.offsetWidth * currentScale;
+                const scaledHeight = mapContainer.offsetHeight * currentScale;
+                const containerWidth = mapContainer.offsetWidth;
+                const containerHeight = mapContainer.offsetHeight;
 
-                currentX = Math.max(Math.min(currentX, 0), -maxPanX);
-                currentY = Math.max(Math.min(currentY, 0), -maxPanY);
+                const maxLeftPan = 0;
+                const maxRightPan = -(scaledWidth - containerWidth);
+                
+                const maxTopPan = 0;
+                const maxBottomPan = -(scaledHeight - containerHeight);
+
+                currentX = Math.max(Math.min(newX, maxLeftPan), maxRightPan);
+                currentY = Math.max(Math.min(newY, maxTopPan), maxBottomPan);
 
                 applyTransform();
             }, { passive: false });
