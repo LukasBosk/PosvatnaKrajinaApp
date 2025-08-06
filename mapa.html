@@ -185,7 +185,7 @@
         .base-map-toggle {
             background-color: #6c757d;
             font-size: 0.9em;
-            white-space: normal; /* Povolení zalamování textu */
+            white-space: normal;
         }
         .base-map-toggle:hover {
             background-color: #5a6268;
@@ -227,7 +227,6 @@
             min-width: 60px;
             padding: 0 16px;
             height: 36px;
-            margin-top: 5px;
             white-space: nowrap;
         }
         .back-button {
@@ -245,6 +244,9 @@
             transition: background-color 0.2s, transform 0.13s, color 0.2s;
             z-index: 1000;
             flex-shrink: 0;
+            position: absolute; /* Použití absolutního pozicování */
+            bottom: 20px;       /* Umístění odspodu */
+            right: 20px;        /* Umístění zprava */
         }
         .back-button:hover {
             background-color: #e0e0e0;
@@ -507,7 +509,6 @@
                 });
             });
 
-            // Logika pro přepínání podkladové mapy
             baseMapToggleButton.addEventListener('click', () => {
                 if (baseMapImage.src.includes('prazdna.jpg')) {
                     baseMapImage.src = './prazdna2.jpg';
@@ -516,7 +517,6 @@
                 }
             });
 
-            // Počáteční aktivní stav
             const initialActiveOverlayBtn = document.querySelector('.map-button.active, .map-button.all-active');
             if (initialActiveOverlayBtn) {
                 mapHeading.textContent = initialActiveOverlayBtn.textContent;
