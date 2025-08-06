@@ -184,6 +184,8 @@
         }
         .base-map-toggle {
             background-color: #6c757d;
+            font-size: 0.9em;
+            white-space: normal; /* Povolení zalamování textu */
         }
         .base-map-toggle:hover {
             background-color: #5a6268;
@@ -299,6 +301,8 @@
                 grid-column: 1 / span 3;
                 width: 100%;
                 max-width: 384px; 
+                font-size: 0.85em;
+                padding: 7px 8px;
             }
             .button-controls .map-button:nth-child(1) { grid-row: 1; grid-column: 1;}
             .button-controls .map-button:nth-child(2) { grid-row: 1; grid-column: 2;}
@@ -358,7 +362,7 @@
                 grid-column: 1 / span 3;
                 width: 100%;
                 max-width: 282px;
-                font-size: 0.82em;
+                font-size: 0.75em;
                 padding: 6px 5px;
             }
             .zoom-controls {
@@ -398,7 +402,7 @@
                 <button class="map-button" data-target="pohrebiste">Pohřebiště</button>
                 <button class="map-button" data-target="hradiste">Hradiště</button>
                 <button class="map-button" data-target="all" id="allBtn">Vše</button>
-                <button class="map-button base-map-toggle" id="baseMapToggleBtn">Podkladová mapa</button>
+                <button class="map-button base-map-toggle" id="baseMapToggleBtn">Přepnout podklad</button>
             </div>
             <div class="zoom-controls">
                 <button class="zoom-button" id="zoomInBtn">+</button>
@@ -503,7 +507,7 @@
                 });
             });
 
-            // Logika pro nové přepínací tlačítko
+            // Logika pro přepínání podkladové mapy
             baseMapToggleButton.addEventListener('click', () => {
                 if (baseMapImage.src.includes('prazdna.jpg')) {
                     baseMapImage.src = './prazdna2.jpg';
