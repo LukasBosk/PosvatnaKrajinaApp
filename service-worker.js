@@ -12,6 +12,7 @@ const urlsToCache = [
   './puzzle.html',
   './rozcesti.html',
   './teren.html',
+  './ostatni.html',
   './predmety.html',
   './script-puzzle.js',
   './script-quiz.js',
@@ -151,6 +152,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
