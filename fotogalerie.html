@@ -54,7 +54,7 @@
             width: 100%;
             max-width: 700px;
             margin: auto;
-            display: flex; /* Flexbox kontejner */
+            display: flex;
             align-items: center;
             flex-grow: 1;
             padding: 20px 0;
@@ -129,8 +129,6 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
             background-color: rgba(0,0,0,0.7);
             color: white;
             padding: 20px;
@@ -172,11 +170,11 @@
         }
         @media (max-width: 768px) {
             .gallery-container {
-                flex-direction: column; /* Na malých obrazovkách se galerie zlomí do sloupce */
+                flex-direction: column;
             }
             .prev, .next {
-                position: relative; /* Změníme pozicování */
-                width: 100%; /* Rozšíříme tlačítka na celou šířku */
+                position: relative;
+                width: 100%;
                 border-radius: 0;
             }
             .gallery-slide img {
@@ -192,7 +190,6 @@
     </div>
     <div class="gallery-container">
         <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-
         <div class="gallery-slide active">
             <div class="image-wrapper">
                 <img src="./Borotin4R.jpg" alt="Popis prvního obrázku">
@@ -226,7 +223,6 @@
                 </p>
             </div>
         </div>
-
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
     <a href="./index.html" class="back-button">Zpět</a>
@@ -244,11 +240,25 @@
             for (i = 0; i < slides.length; i++) {
                 slides[i].style.display = "none";  
             }
-            slides[slideIndex-1].style.display = "block";  
+            slides[slideIndex-1].style.display = "block";
+            // Voláme funkci pro přizpůsobení velikosti po každém zobrazení nového slidu
+            resizeOverlay();
         }
         function toggleInfo(button) {
             const overlay = button.parentNode.parentNode.querySelector('.info-overlay');
             overlay.classList.toggle('show');
+        }
+        // Nová funkce pro přizpůsobení velikosti overlay
+        function resizeOverlay() {
+            const activeSlide = document.querySelector('.gallery-slide.active');
+            if (activeSlide) {
+                const img = activeSlide.querySelector('img');
+                const overlay = activeSlide.querySelector('.info-overlay');
+                if (img && overlay) {
+                    overlay.style.width = `${img.offsetWidth}px`;
+                    overlay.style.height = `${img.offsetHeight}px`;
+                }
+            }
         }
         document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.gallery-slide img');
@@ -260,6 +270,9 @@
                     e.preventDefault();
                 });
             });
+            // Voláme resizeOverlay při načtení a při změně velikosti okna
+            window.addEventListener('load', resizeOverlay);
+            window.addEventListener('resize', resizeOverlay);
         });
     </script>
 </body>
