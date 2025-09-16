@@ -115,53 +115,45 @@
         </div>
     </div>
 
-    <script>
-        // Register Service Worker for PWA functionality
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker zaregistrován s rozsahem:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('Registrace Service Worker se nezdařila:', error);
-                    });
-            });
-        }
-    </script>
-    <script>
-        window.addEventListener('load', () => {
-            const loadingScreen = document.getElementById('loading-screen');
+<script>
+  window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const loadingText = loadingScreen.querySelector('h1');
 
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker zaregistrován.');
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(registration => {
+          console.log('Service Worker zaregistrován.');
 
-                        // Sledujeme stav instalace service workeru
-                        const worker = registration.installing || registration.waiting || registration.active;
-                        if (worker) {
-                            worker.addEventListener('statechange', () => {
-                                if (worker.state === 'activated' || worker.state === 'redundant') {
-                                    // Když je service worker aktivován nebo selže, skryjeme obrazovku
-                                    loadingScreen.style.display = 'none';
-                                }
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Registrace Service Workeru selhala.', err);
-                        // Pokud registrace selže, obrazovka se také skryje
-                        loadingScreen.style.display = 'none';
-                    });
-            } else {
-                console.log('Prohlížeč nepodporuje Service Worker.');
-                loadingScreen.style.display = 'none';
+          // Zobrazíme stahovací obrazovku okamžitě po spuštění skriptu
+          loadingScreen.style.display = 'flex';
+
+          // Nasloucháme zprávám od service workeru
+          navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data.type === 'progress') {
+              // Aktualizujeme text s procenty
+              loadingText.textContent = `Stahuji aplikaci (${event.data.value}%), prosím počkejte...`;
+            } else if (event.data.type === 'complete') {
+              // Jakmile je stahování hotovo, skryjeme obrazovku
+              loadingScreen.style.display = 'none';
+              console.log('Stahování dokončeno. Aplikace je připravena k použití.');
             }
+          });
+        })
+        .catch(err => {
+          console.error('Registrace Service Workeru selhala.', err);
+          // V případě chyby skryjeme obrazovku
+          loadingScreen.style.display = 'none';
         });
-    </script>    
+    } else {
+      console.log('Prohlížeč nepodporuje Service Worker.');
+      loadingScreen.style.display = 'none';
+    }
+  });
+</script>  
 </body>
 </html>
+
 
 
 
