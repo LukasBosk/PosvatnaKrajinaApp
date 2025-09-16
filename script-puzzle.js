@@ -33,10 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'images/puzzle18.jpg',
         'images/puzzle19.jpg',
         'images/puzzle20.jpg',
-        'images/puzzle21.jpg',
-        'images/puzzle22.jpg',
-        'images/puzzle23.jpg',
-        'images/puzzle24.jpg'
+        'images/puzzle21.jpg'
     ];
 
     const puzzleMessages = {
@@ -60,10 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'images/puzzle18.jpg': '',
         'images/puzzle19.jpg': '',
         'images/puzzle20.jpg': '',
-        'images/puzzle21.jpg': '',
-        'images/puzzle22.jpg': '',
-        'images/puzzle23.jpg': '',
-        'images/puzzle24.jpg': ''
+        'images/puzzle21.jpg': ''
     };
 
     let currentPuzzleIndex = 0;
@@ -425,3 +419,4 @@ document.addEventListener('DOMContentLoaded', () => {
         loadPuzzle(currentPuzzleIndex);
     });
 });
+
