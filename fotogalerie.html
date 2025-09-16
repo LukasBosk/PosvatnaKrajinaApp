@@ -68,15 +68,12 @@
         .gallery-slide.active {
             display: block;
         }
-        .image-wrapper { /* Nově přepracovaný div na CSS Grid */
+        .image-wrapper {
             position: relative;
-            display: grid;
-            grid-template-areas: "content";
-            place-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             width: 100%;
-        }
-        .image-wrapper > * {
-            grid-area: content;
         }
         .gallery-slide img {
             max-width: 100%;
@@ -129,6 +126,9 @@
         }
         .info-overlay {
             display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
             background-color: rgba(0,0,0,0.7);
             color: white;
             padding: 20px;
@@ -166,7 +166,7 @@
         }
         .back-button:active {
             transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
         }
         @media (max-width: 768px) {
             .gallery-container {
@@ -230,9 +230,11 @@
     <script>
         let slideIndex = 1;
         showSlides(slideIndex);
+
         function plusSlides(n) {
             showSlides(slideIndex += n);
         }
+
         function showSlides(n) {
             let i;
             let slides = document.getElementsByClassName("gallery-slide");
@@ -242,11 +244,32 @@
                 slides[i].style.display = "none";
             }
             slides[slideIndex-1].style.display = "block";
+            // Zavoláme funkci pro přizpůsobení velikosti po každém zobrazení nového slidu
+            resizeOverlay();
         }
+
         function toggleInfo(button) {
             const overlay = button.nextElementSibling;
             overlay.classList.toggle('show');
+            // Znovu zavoláme resizeOverlay, abychom měli jistotu, že je velikost správná i při zobrazení/skrytí
+            resizeOverlay();
         }
+
+        function resizeOverlay() {
+            const activeSlide = document.querySelector('.gallery-slide.active');
+            if (activeSlide) {
+                const img = activeSlide.querySelector('img');
+                const overlay = activeSlide.querySelector('.info-overlay');
+                if (img && overlay) {
+                    const imgRect = img.getBoundingClientRect();
+                    overlay.style.width = `${imgRect.width}px`;
+                    overlay.style.height = `${imgRect.height}px`;
+                    overlay.style.top = `${img.offsetTop}px`;
+                    overlay.style.left = `${img.offsetLeft}px`;
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.gallery-slide img');
             images.forEach(img => {
@@ -257,6 +280,12 @@
                     e.preventDefault();
                 });
             });
+
+            window.addEventListener('load', resizeOverlay);
+            window.addEventListener('resize', resizeOverlay);
+            
+            // Pro jistotu přidáváme volání i po načtení DOM, kdyby obrázek byl už v cache
+            resizeOverlay();
         });
     </script>
 </body>
