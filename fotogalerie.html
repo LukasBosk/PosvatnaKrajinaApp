@@ -129,6 +129,8 @@
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
             background-color: rgba(0,0,0,0.7);
             color: white;
             padding: 20px;
@@ -190,39 +192,41 @@
     </div>
     <div class="gallery-container">
         <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+
         <div class="gallery-slide active">
             <div class="image-wrapper">
                 <img src="./Borotin4R.jpg" alt="Popis prvního obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
-            </div>
-            <div class="info-overlay">
-                <p>
-                    Zde bude textový popisek k prvnímu obrázku.
-                </p>
+                <div class="info-overlay">
+                    <p>
+                        Zde bude textový popisek k prvnímu obrázku.
+                    </p>
+                </div>
             </div>
         </div>
         <div class="gallery-slide">
             <div class="image-wrapper">
                 <img src="./Michov10R.jpg" alt="Popis druhého obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
-            </div>
-            <div class="info-overlay">
-                <p>
-                    Zde bude popisek k druhému obrázku.
-                </p>
+                <div class="info-overlay">
+                    <p>
+                        Zde bude popisek k druhému obrázku.
+                    </p>
+                </div>
             </div>
         </div>        
         <div class="gallery-slide">
             <div class="image-wrapper">
                 <img src="./OsadaR.jpg" alt="Popis druhého obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
-            </div>
-            <div class="info-overlay">
-                <p>
-                    Zde bude popisek k druhému obrázku.
-                </p>
+                <div class="info-overlay">
+                    <p>
+                        Zde bude popisek k druhému obrázku.
+                    </p>
+                </div>
             </div>
         </div>
+
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
     <a href="./index.html" class="back-button">Zpět</a>
@@ -235,30 +239,16 @@
         function showSlides(n) {
             let i;
             let slides = document.getElementsByClassName("gallery-slide");
-            if (n > slides.length) {slideIndex = 1}    
+            if (n > slides.length) {slideIndex = 1}
             if (n < 1) {slideIndex = slides.length}
             for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";  
+                slides[i].style.display = "none";
             }
             slides[slideIndex-1].style.display = "block";
-            // Voláme funkci pro přizpůsobení velikosti po každém zobrazení nového slidu
-            resizeOverlay();
         }
         function toggleInfo(button) {
-            const overlay = button.parentNode.parentNode.querySelector('.info-overlay');
+            const overlay = button.nextElementSibling;
             overlay.classList.toggle('show');
-        }
-        // Nová funkce pro přizpůsobení velikosti overlay
-        function resizeOverlay() {
-            const activeSlide = document.querySelector('.gallery-slide.active');
-            if (activeSlide) {
-                const img = activeSlide.querySelector('img');
-                const overlay = activeSlide.querySelector('.info-overlay');
-                if (img && overlay) {
-                    overlay.style.width = `${img.offsetWidth}px`;
-                    overlay.style.height = `${img.offsetHeight}px`;
-                }
-            }
         }
         document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.gallery-slide img');
@@ -270,9 +260,6 @@
                     e.preventDefault();
                 });
             });
-            // Voláme resizeOverlay při načtení a při změně velikosti okna
-            window.addEventListener('load', resizeOverlay);
-            window.addEventListener('resize', resizeOverlay);
         });
     </script>
 </body>
