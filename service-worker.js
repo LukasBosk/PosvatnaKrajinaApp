@@ -97,13 +97,34 @@ const urlsToCache = [
 
 // Instalace Service Workeru: Cache statické soubory
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
+  // Vytvoříme Promise pro celou instalaci, aby se zabránilo zbytečné aktivaci
+  const preCachePromise = caches.open(CACHE_NAME)
+    .then(cache => {
+      // Projdeme všechny soubory a postupně je stáhneme
+      return Promise.all(
+        urlsToCache.map((url, index) => {
+          return cache.add(url).then(() => {
+            // Po každém stažení odešleme zprávu o pokroku
+            const progress = Math.round(((index + 1) / urlsToCache.length) * 100);
+            self.clients.matchAll().then(clients => {
+              clients.forEach(client => {
+                client.postMessage({ type: 'progress', value: progress });
+              });
+            });
+          });
+        })
+      );
+    })
+    .then(() => {
+      // Po dokončení všech stahování odešleme zprávu o dokončení
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'complete' });
+        });
+      });
+    });
+
+  event.waitUntil(preCachePromise);
 });
 
 // Aktivace Service Workeru: Vyčištění starých cachí
@@ -155,6 +176,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
