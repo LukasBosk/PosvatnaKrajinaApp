@@ -49,7 +49,6 @@
             font-size: 1.25em;
             margin: 0;
         }
-
         /* Sekce pro galerii */
         .gallery-container {
             width: 100%;
@@ -68,6 +67,10 @@
         }
         .gallery-slide.active {
             display: block;
+        }
+        .image-wrapper { /* Nově přidaný wrapper */
+            position: relative;
+            display: inline-block;
         }
         .gallery-slide img {
             max-width: 100%;
@@ -102,7 +105,6 @@
         .prev:hover, .next:hover {
             background-color: rgba(0,0,0,0.8);
         }
-
         /* Popisek a tlačítko pro info */
         .info-button {
             position: absolute;
@@ -143,7 +145,6 @@
         .info-overlay.show {
             display: block;
         }
-        
         .back-button {
             position: fixed;
             bottom: 20px;
@@ -177,52 +178,50 @@
         <img src="./logo.png" alt="Logo Muzea regionu Boskovicka">
         <h1>Fotogalerie</h1>
     </div>
-
     <div class="gallery-container">
         <div class="gallery-slide active">
-            <img src="./Borotin4R.jpg" alt="Rekonstrukce Borotín 4">
-            <button class="info-button" onclick="toggleInfo(this)">i</button>
+            <div class="image-wrapper">
+                <img src="./Borotin4R.jpg" alt="Rekonstrukce Borotín 4">
+                <button class="info-button" onclick="toggleInfo(this)">i</button>
+            </div>
             <div class="info-overlay">
                 <p>
                     Rekonstrukce vzhledu ženy s použitím artefaktů z depotu Borotín 4. Obětinu šperků, nalezenou v blízkosti výchozu pískovcové skály, čítající 16 kusů, původně tvořily dva šperky: spona ukončená růžicemi a náhrdelník. Osm závěsků ve tvaru koleček se čtyřmi loukotěmi, závěsek ve tvaru srpku a jednoduchý litý kroužek, stejně jako trubičky z plechu a točeného drátu, mohly původně tvořit závěs – náhrdelník – spojený organickou nití. Jednotlivé závěsky jsou zajímavé tím, že všechny symbolizují tvar nebeských těles. Nálezce: Tomáš Lusk, 2016.
                 </p>
             </div>
         </div>
-
         <div class="gallery-slide">
-            <img src="./Michov10R.jpg" alt="Rekonstrukce Míchov 10">
-            <button class="info-button" onclick="toggleInfo(this)">i</button>
+            <div class="image-wrapper">
+                <img src="./Michov10R.jpg" alt="Rekonstrukce Míchov 10">
+                <button class="info-button" onclick="toggleInfo(this)">i</button>
+            </div>
             <div class="info-overlay">
                 <p>
                     Rekonstrukce vzhledu ženy na základě luxusní ženské garnitury z depotu Míchov 10. Honosný depotový soubor tvoří dva masivní spirálovité náramky ukončené růžicemi a dva křehké spirálovité nánožníky s růžicemi. Nánožníky, vyrobené z extrémně tenkého plechu zdobeného raženou výzdobou, byly nošeny opakovaně, o čemž svědčí stopy oprav pomocí drátků na třech místech. Depot byl objeven na vrcholku kopce. Kruhové spirály na špercích symbolizují božstvo Slunce, kterému nejspíš byla tato obětina určena. Nálezci: Vlastislav Konečný a Jakub Rozsýval, 2016.
                 </p>
             </div>
-        </div>
-
+        </div>        
         <div class="gallery-slide">
-            <img src="./OsadaR.jpg" alt="Rekonstrukce osady">
-            <button class="info-button" onclick="toggleInfo(this)">i</button>
+            <div class="image-wrapper">
+                <img src="./OsadaR.jpg" alt="Rekonstrukce osady">
+                <button class="info-button" onclick="toggleInfo(this)">i</button>
+            </div>
             <div class="info-overlay">
                 <p>
                     Rekonstrukce osady z období popelnicových polí. Archeologické výzkumy prokázaly domy kůlové konstrukce, někdy i tzv. polozemnice – stavby částečně zahloubené do terénu.
                 </p>
             </div>
         </div>
-
         <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
-
     <a href="./index.html" class="back-button">Zpět</a>
-
     <script>
         let slideIndex = 1;
         showSlides(slideIndex);
-
         function plusSlides(n) {
             showSlides(slideIndex += n);
         }
-
         function showSlides(n) {
             let i;
             let slides = document.getElementsByClassName("gallery-slide");
@@ -233,12 +232,10 @@
             }
             slides[slideIndex-1].style.display = "block";  
         }
-        
         function toggleInfo(button) {
-            const overlay = button.parentNode.querySelector('.info-overlay');
+            const overlay = button.parentNode.parentNode.querySelector('.info-overlay');
             overlay.classList.toggle('show');
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.gallery-slide img');
             images.forEach(img => {
