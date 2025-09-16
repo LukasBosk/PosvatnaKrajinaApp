@@ -54,8 +54,7 @@
             width: 100%;
             max-width: 700px;
             margin: auto;
-            display: flex;
-            justify-content: center;
+            display: flex; /* Flexbox kontejner */
             align-items: center;
             flex-grow: 1;
             padding: 20px 0;
@@ -63,14 +62,18 @@
         .gallery-slide {
             display: none;
             text-align: center;
+            width: 100%;
             position: relative;
         }
         .gallery-slide.active {
             display: block;
         }
-        .image-wrapper { /* Nově přidaný wrapper */
+        .image-wrapper {
             position: relative;
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
         .gallery-slide img {
             max-width: 100%;
@@ -81,8 +84,6 @@
         }
         .prev, .next {
             cursor: pointer;
-            position: absolute;
-            top: 50%;
             width: auto;
             padding: 16px;
             color: white;
@@ -91,15 +92,13 @@
             transition: 0.6s ease;
             user-select: none;
             background-color: rgba(0,0,0,0.5);
-            transform: translateY(-50%);
             z-index: 20;
+            text-decoration: none;
         }
         .next {
-            right: 0;
             border-radius: 3px 0 0 3px;
         }
         .prev {
-            left: 0;
             border-radius: 0 3px 3px 0;
         }
         .prev:hover, .next:hover {
@@ -171,6 +170,19 @@
             transform: translateY(0);
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
+        @media (max-width: 768px) {
+            .gallery-container {
+                flex-direction: column; /* Na malých obrazovkách se galerie zlomí do sloupce */
+            }
+            .prev, .next {
+                position: relative; /* Změníme pozicování */
+                width: 100%; /* Rozšíříme tlačítka na celou šířku */
+                border-radius: 0;
+            }
+            .gallery-slide img {
+                max-height: 50vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -179,40 +191,42 @@
         <h1>Fotogalerie</h1>
     </div>
     <div class="gallery-container">
+        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+
         <div class="gallery-slide active">
             <div class="image-wrapper">
-                <img src="./Borotin4R.jpg" alt="Rekonstrukce Borotín 4">
+                <img src="./Borotin4R.jpg" alt="Popis prvního obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
             </div>
             <div class="info-overlay">
                 <p>
-                    Rekonstrukce vzhledu ženy s použitím artefaktů z depotu Borotín 4. Obětinu šperků, nalezenou v blízkosti výchozu pískovcové skály, čítající 16 kusů, původně tvořily dva šperky: spona ukončená růžicemi a náhrdelník. Osm závěsků ve tvaru koleček se čtyřmi loukotěmi, závěsek ve tvaru srpku a jednoduchý litý kroužek, stejně jako trubičky z plechu a točeného drátu, mohly původně tvořit závěs – náhrdelník – spojený organickou nití. Jednotlivé závěsky jsou zajímavé tím, že všechny symbolizují tvar nebeských těles. Nálezce: Tomáš Lusk, 2016.
+                    Zde bude textový popisek k prvnímu obrázku.
                 </p>
             </div>
         </div>
         <div class="gallery-slide">
             <div class="image-wrapper">
-                <img src="./Michov10R.jpg" alt="Rekonstrukce Míchov 10">
+                <img src="./Michov10R.jpg" alt="Popis druhého obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
             </div>
             <div class="info-overlay">
                 <p>
-                    Rekonstrukce vzhledu ženy na základě luxusní ženské garnitury z depotu Míchov 10. Honosný depotový soubor tvoří dva masivní spirálovité náramky ukončené růžicemi a dva křehké spirálovité nánožníky s růžicemi. Nánožníky, vyrobené z extrémně tenkého plechu zdobeného raženou výzdobou, byly nošeny opakovaně, o čemž svědčí stopy oprav pomocí drátků na třech místech. Depot byl objeven na vrcholku kopce. Kruhové spirály na špercích symbolizují božstvo Slunce, kterému nejspíš byla tato obětina určena. Nálezci: Vlastislav Konečný a Jakub Rozsýval, 2016.
+                    Zde bude popisek k druhému obrázku.
                 </p>
             </div>
         </div>        
         <div class="gallery-slide">
             <div class="image-wrapper">
-                <img src="./OsadaR.jpg" alt="Rekonstrukce osady">
+                <img src="./OsadaR.jpg" alt="Popis druhého obrázku">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
             </div>
             <div class="info-overlay">
                 <p>
-                    Rekonstrukce osady z období popelnicových polí. Archeologické výzkumy prokázaly domy kůlové konstrukce, někdy i tzv. polozemnice – stavby částečně zahloubené do terénu.
+                    Zde bude popisek k druhému obrázku.
                 </p>
             </div>
         </div>
-        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+
         <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
     <a href="./index.html" class="back-button">Zpět</a>
