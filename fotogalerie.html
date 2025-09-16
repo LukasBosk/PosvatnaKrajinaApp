@@ -193,33 +193,33 @@
 
         <div class="gallery-slide active">
             <div class="image-wrapper">
-                <img src="./Borotin4R.jpg" alt="Popis prvního obrázku">
+                <img src="./Borotin4R.jpg" alt="Rekonstrukce Borotín 4">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
                 <div class="info-overlay">
                     <p>
-                        Zde bude textový popisek k prvnímu obrázku.
+                        Rekonstrukce vzhledu ženy s použitím artefaktů z depotu Borotín 4. Obětinu šperků, nalezenou v blízkosti výchozu pískovcové skály, čítající 16 kusů, původně tvořily dva šperky: spona ukončená růžicemi a náhrdelník. Osm závěsků ve tvaru koleček se čtyřmi loukotěmi, závěsek ve tvaru srpku a jednoduchý litý kroužek, stejně jako trubičky z plechu a točeného drátu, mohly původně tvořit závěs – náhrdelník – spojený organickou nití. Jednotlivé závěsky jsou zajímavé tím, že všechny symbolizují tvar nebeských těles. Nálezce: Tomáš Lusk, 2016.
                     </p>
                 </div>
             </div>
         </div>
         <div class="gallery-slide">
             <div class="image-wrapper">
-                <img src="./Michov10R.jpg" alt="Popis druhého obrázku">
+                <img src="./Michov10R.jpg" alt="Rekonstrukce Míchov 10">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
                 <div class="info-overlay">
                     <p>
-                        Zde bude popisek k druhému obrázku.
+                        Rekonstrukce vzhledu ženy na základě luxusní ženské garnitury z depotu Míchov 10. Honosný depotový soubor tvoří dva masivní spirálovité náramky ukončené růžicemi a dva křehké spirálovité nánožníky s růžicemi. Nánožníky, vyrobené z extrémně tenkého plechu zdobeného raženou výzdobou, byly nošeny opakovaně, o čemž svědčí stopy oprav pomocí drátků na třech místech. Depot byl objeven na vrcholku kopce. Kruhové spirály na špercích symbolizují božstvo Slunce, kterému nejspíš byla tato obětina určena. Nálezci: Vlastislav Konečný a Jakub Rozsýval, 2016.
                     </p>
                 </div>
             </div>
         </div>        
         <div class="gallery-slide">
             <div class="image-wrapper">
-                <img src="./OsadaR.jpg" alt="Popis druhého obrázku">
+                <img src="./OsadaR.jpg" alt="Rekonstrukce osady">
                 <button class="info-button" onclick="toggleInfo(this)">i</button>
                 <div class="info-overlay">
                     <p>
-                        Zde bude popisek k druhému obrázku.
+                        Rekonstrukce osady z období popelnicových polí. Archeologické výzkumy prokázaly domy kůlové konstrukce, někdy i tzv. polozemnice – stavby částečně zahloubené do terénu.
                     </p>
                 </div>
             </div>
@@ -244,48 +244,66 @@
                 slides[i].style.display = "none";
             }
             slides[slideIndex-1].style.display = "block";
-            // Zavoláme funkci pro přizpůsobení velikosti po každém zobrazení nového slidu
-            resizeOverlay();
         }
 
         function toggleInfo(button) {
-            const overlay = button.nextElementSibling;
-            overlay.classList.toggle('show');
-            // Znovu zavoláme resizeOverlay, abychom měli jistotu, že je velikost správná i při zobrazení/skrytí
-            resizeOverlay();
-        }
+            const imageWrapper = button.parentNode;
+            const overlay = imageWrapper.querySelector('.info-overlay');
+            const img = imageWrapper.querySelector('img');
 
-        function resizeOverlay() {
-            const activeSlide = document.querySelector('.gallery-slide.active');
-            if (activeSlide) {
-                const img = activeSlide.querySelector('img');
-                const overlay = activeSlide.querySelector('.info-overlay');
-                if (img && overlay) {
+            if (overlay.classList.contains('show')) {
+                overlay.classList.remove('show');
+            } else {
+                // Přizpůsobíme velikost popisku PŘED zobrazením
+                if (img) {
                     const imgRect = img.getBoundingClientRect();
                     overlay.style.width = `${imgRect.width}px`;
                     overlay.style.height = `${imgRect.height}px`;
                     overlay.style.top = `${img.offsetTop}px`;
                     overlay.style.left = `${img.offsetLeft}px`;
                 }
+                overlay.classList.add('show');
             }
         }
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             const images = document.querySelectorAll('.gallery-slide img');
             images.forEach(img => {
+                // Zabráníme stahování
                 img.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                 });
                 img.addEventListener('dragstart', (e) => {
                     e.preventDefault();
                 });
+                // Spustíme funkci pro přizpůsobení, jakmile se obrázek načte (i z cache)
+                img.addEventListener('load', () => {
+                    const currentSlide = img.closest('.gallery-slide');
+                    if (currentSlide.classList.contains('active')) {
+                         const overlay = currentSlide.querySelector('.info-overlay');
+                         const imgRect = img.getBoundingClientRect();
+                         overlay.style.width = `${imgRect.width}px`;
+                         overlay.style.height = `${imgRect.height}px`;
+                         overlay.style.top = `${img.offsetTop}px`;
+                         overlay.style.left = `${img.offsetLeft}px`;
+                    }
+                });
             });
-
-            window.addEventListener('load', resizeOverlay);
-            window.addEventListener('resize', resizeOverlay);
-            
-            // Pro jistotu přidáváme volání i po načtení DOM, kdyby obrázek byl už v cache
-            resizeOverlay();
+            // Přizpůsobení při změně velikosti okna
+            window.addEventListener('resize', () => {
+                const activeSlide = document.querySelector('.gallery-slide.active');
+                if (activeSlide) {
+                    const img = activeSlide.querySelector('img');
+                    const overlay = activeSlide.querySelector('.info-overlay');
+                    if (img && overlay) {
+                        const imgRect = img.getBoundingClientRect();
+                        overlay.style.width = `${imgRect.width}px`;
+                        overlay.style.height = `${imgRect.height}px`;
+                        overlay.style.top = `${img.offsetTop}px`;
+                        overlay.style.left = `${img.offsetLeft}px`;
+                    }
+                }
+            });
         });
     </script>
 </body>
