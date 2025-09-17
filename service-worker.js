@@ -1,4 +1,4 @@
-const CACHE_NAME = 'muzeum-boskovicka-cache-v95';
+const CACHE_NAME = 'muzeum-boskovicka-cache-v96';
 
 // Seznam souborů, které se mají při instalaci Service Workeru uložit do cache
 // DŮLEŽITÉ: Ujistěte se, že zde jsou uvedeny VŠECHNY soubory, které aplikace potřebuje k offline provozu,
@@ -18,7 +18,6 @@ const urlsToCache = [
   './fotogalerie.html',
   './script-puzzle.js',
   './script-quiz.js',
-  './draco_decoder.js',
   './style-puzzle.css',
   './style-quiz.css',
   './manifest.json',
@@ -164,6 +163,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
