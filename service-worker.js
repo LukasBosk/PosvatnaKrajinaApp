@@ -64,7 +64,9 @@ const urlsToCache = [
   './sidliste-body.png',
   './prazdna.jpg',
   './Borotin4R.jpg',
+  './Borotin4R2.jpg',
   './Michov10R.jpg',
+  './Michov10R2.jpg',
   './OsadaR.jpg',
   './prazdna2.jpg',
   './ramecek1.png',
@@ -155,6 +157,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
