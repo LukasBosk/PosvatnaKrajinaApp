@@ -18,6 +18,7 @@ const urlsToCache = [
   './fotogalerie.html',
   './script-puzzle.js',
   './script-quiz.js',
+  './draco_decoder.js',
   './style-puzzle.css',
   './style-quiz.css',
   './manifest.json',
@@ -163,6 +164,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
