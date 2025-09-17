@@ -67,6 +67,12 @@ const urlsToCache = [
   './Borotin4R2.jpg',
   './Michov10R.jpg',
   './Michov10R2.jpg',
+  './Vanovice6R.jpg',
+  './Vanovice6R2.jpg',
+  './Vanovice4R2.jpg',
+  './Vanovice4R.jpg',
+  './VelkeOpatovice1R.jpg',
+  './VelkeOpatovice1R2.jpg',
   './OsadaR.jpg',
   './prazdna2.jpg',
   './ramecek1.png',
@@ -157,6 +163,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
