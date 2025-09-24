@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Laténská kultura'
             ],
             correctAnswer: 1
-        },
+        }
         // Zde můžete přidat další otázky
     ];
 
@@ -237,5 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
     shuffledQuestions = quizQuestions; // Uložíme zamíchané otázky
     loadQuestion(); // Načteme první otázku
 });
+
 
 
