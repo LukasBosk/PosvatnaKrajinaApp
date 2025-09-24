@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             // Další textová otázka
-            question: 'Jaký byl nejběžnšjší typ pohřbu během mladší a pozdní doby bronzové',
+            question: 'Jaký byl nejběžnější typ pohřbu během mladší a pozdní doby bronzové',
             options: [
                 'Kostrový',
                 'Žárový'
@@ -227,3 +227,4 @@ document.addEventListener('DOMContentLoaded', () => {
     shuffledQuestions = quizQuestions; // Uložíme zamíchané otázky
     loadQuestion(); // Načteme první otázku
 });
+
