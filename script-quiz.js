@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             question: 'Jakou archeologickou kulturu je možné zařadit do mladší doby bronzové?',
             options: [
                 'Středodunajská mohylová kultura',
-                'Kultura lužických popelnicových polí'
+                'Kultura lužických popelnicových polí',
                 'Laténská kultura'
             ],
             correctAnswer: 1
@@ -237,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     shuffledQuestions = quizQuestions; // Uložíme zamíchané otázky
     loadQuestion(); // Načteme první otázku
 });
+
 
 
 
