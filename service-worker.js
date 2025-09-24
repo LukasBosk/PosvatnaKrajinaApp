@@ -77,6 +77,7 @@ const urlsToCache = [
   './hrob2R.jpg',
   './osada2R.jpg',
   './osada3R.jpg',
+  './tkaniR.jpg',
   './VelkeOpatovice1R.jpg',
   './VelkeOpatovice1R2.jpg',
   './OsadaR.jpg',
@@ -169,6 +170,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
