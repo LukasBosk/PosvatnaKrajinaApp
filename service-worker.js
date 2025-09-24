@@ -72,6 +72,7 @@ const urlsToCache = [
   './Vanovice4R2.jpg',
   './Vanovice4R.jpg',
   './plodinyR.jpg',
+  './symbolyR.jpg',
   './srpR.jpg',
   './hrobR.jpg',
   './hrob2R.jpg',
@@ -170,6 +171,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
