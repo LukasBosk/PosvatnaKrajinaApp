@@ -81,6 +81,7 @@ const urlsToCache = [
   './tkaniR.jpg',
   './interierR.jpg',
   './keramikaR.jpg',
+  './kadlubyR.jpg',
   './VelkeOpatovice1R.jpg',
   './VelkeOpatovice1R2.jpg',
   './OsadaR.jpg',
@@ -173,6 +174,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
