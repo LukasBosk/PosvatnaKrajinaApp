@@ -58,6 +58,16 @@ const urlsToCache = [
   './images/puzzle19.jpg',
   './images/puzzle20.jpg',
   './images/puzzle21.jpg',
+  'images/Borotin4R.jpg',
+  'images/Borotin4R2.jpg',
+  'images/Michov10R.jpg',
+  'images/Michov10R2.jpg',
+  'images/Vanovice4R.jpg',
+  'images/Vanovice4R2.jpg',
+  'images/Vanovice6R.jpg',
+  'images/Vanovice6R2.jpg',
+  'images/VelkeOpatovice1R.jpg',
+  'images/VelkeOpatovice1R2.jpg',
   './depoty-body.png',
   './hradiste-body.png',
   './pohrebiste-body.png',
@@ -174,6 +184,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
