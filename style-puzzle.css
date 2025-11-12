@@ -1,0 +1,233 @@
+:root {
+    /* Tuto hodnotu přepíše JavaScript pro stabilní výšku viewportu (vh) */
+    --vh: 1vh; 
+}
+
+html {
+    /* HTML element se roztáhne na celou výšku, aby se body mohl správně zarovnat */
+    height: 100%; 
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    /* Povolíme padding, který se správně odečte v JS */
+    padding: 20px; 
+    
+    background-image: url('./pozadi.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    /* Důležité: min-height musí používat stabilní jednotku na mobilu, na PC to povolí scroll */
+    min-height: calc(var(--vh, 1vh) * 100); 
+    box-sizing: border-box;
+    /* KLÍČOVÁ ZMĚNA: Povolí vertikální scroll bar, pokud se obsah nevejde (což je klíčové pro PC) */
+    overflow-y: auto; 
+    position: relative;
+}
+
+/* Styly pro hlavičku */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px; 
+    flex-wrap: wrap;
+    text-align: center;
+    padding-top: 20px;
+    flex-shrink: 0;
+}
+.header img {
+    height: 60px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+.header h1 {
+    color: white;
+    font-size: 1.25em;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+/* Styly tlačítek a ovládacích prvků */
+.navigation-controls, .game-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 10px 0;
+    padding: 0 10px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+button, .back-button {
+    background-color: white;
+    color: #4285f4;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+button:disabled {
+    background-color: #eee;
+    color: #aaa;
+    cursor: default;
+    box-shadow: none;
+}
+
+button:hover:not(:disabled) {
+    background-color: #f0f0f0;
+    transform: translateY(-1px);
+}
+
+#puzzle-info {
+    color: white;
+    font-weight: bold;
+    margin: 0 15px;
+    font-size: 1.1em;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+/* --- KLÍČOVÉ STYLY PRO PUZZLE --- */
+
+#puzzle-container {
+    display: grid;
+    max-width: 100%; 
+    max-height: 100%;
+    
+    /* Rámeček kontejneru je neviditelný, aby se nepřekrýval s okraji dílků */
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); 
+    
+    margin: 20px auto; 
+    transition: box-shadow 0.3s;
+}
+
+.puzzle-piece {
+    background-repeat: no-repeat; 
+    position: relative; 
+    
+    /* Zobrazení mřížky BĚHEM HRY: 1px okraj s lehkým stínem */
+    border: 1px solid rgba(0, 0, 0, 0.4); 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    
+    box-sizing: border-box;
+    cursor: grab;
+    user-select: none;
+    touch-action: none; 
+    transition: box-shadow 0.2s, border-color 0.2s, border 0.3s; 
+}
+
+/* --- KLÍČOVÁ ZMĚNA PRO SKRYTÍ MŘÍŽKY --- */
+#puzzle-container.solved .puzzle-piece {
+    /* Po složení nastavíme okraj na průhledný a odstraníme stín, aby se dílky spojily */
+    border: 0 solid transparent !important; /* Důležité: 0px tloušťka */
+    box-shadow: none !important;
+}
+
+/* Vizuální feedback při výhře na kontejneru */
+#puzzle-container.solved {
+    box-shadow: 0 0 15px limegreen;
+}
+/* --- KONEC KLÍČOVÉ ZMĚNY --- */
+
+
+.puzzle-piece.highlight {
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+    border-color: yellow;
+    z-index: 1001; 
+}
+
+.puzzle-piece.dragging {
+    z-index: 1002 !important; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    cursor: grabbing;
+}
+
+.puzzle-piece.correct {
+    /* Jemný zelený okraj při správné poloze, pokud ještě není složeno (tj. není třída .solved) */
+    border-color: rgba(0, 255, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+#message {
+    color: white; 
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 100px;
+    max-width: 80%;
+    flex-shrink: 0;
+}
+
+.back-button {
+    /* Používáme fixed, aby tlačítko neovlivňovalo výpočet dostupné výšky */
+    position: static;
+    bottom: auto;
+    right: auto;
+    align-self: flex-end;
+    display: block;
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+
+/* Responzivní úpravy pro menší displeje */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .header {
+        margin-bottom: 10px;
+        padding-top: 10px;
+    }
+
+    .header img {
+        height: 50px;
+        margin-right: 10px;
+    }
+    .header h1 {
+        font-size: 1.1em;
+    }
+
+    .navigation-controls, .game-controls {
+        margin: 5px 0;
+        padding: 0 5px;
+    }
+
+    button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
+    #puzzle-info {
+        font-size: 0.9em;
+        margin: 0 10px;
+    }
+}
