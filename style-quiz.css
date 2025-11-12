@@ -1,0 +1,238 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-image: url('./pozadi.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Styly pro hlavičku - stejné jako u puzzle */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    text-align: center;
+    padding-top: 20px;
+}
+.header img {
+    height: 60px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+.header h1 {
+    color: white;
+    font-size: 1.25em; /* Stejná velikost nadpisu */
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+/* Styly pro kvízový kontejner */
+.quiz-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
+    margin-bottom: 100px; /* Místo pro tlačítko ZPĚT */
+}
+
+.quiz-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.image-container {
+    width: 100%;
+    max-width: 400px; /* Omezení velikosti obrázku */
+    margin: 0 auto 30px auto;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+#quiz-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ZMĚNA ZDE: Použití Flexboxu pro zarovnání tlačítek */
+.answers-grid {
+    display: flex; /* Použijeme flexbox */
+    flex-wrap: wrap; /* Umožní zalomení na další řádek na malých obrazovkách */
+    justify-content: center; /* Vycentruje tlačítka horizontálně */
+    gap: 15px; /* Mezera mezi tlačítky */
+    margin-top: 20px;
+}
+
+.answer-button {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* width: 100%; */ /* Už nepotřebujeme 100% šířku pro flexbox */
+    flex: 1; /* Umožní tlačítkům roztáhnout se a zabírat dostupný prostor */
+    min-width: 200px; /* Minimální šířka pro tlačítko, aby nebyly moc úzké */
+    max-width: 30%; /* Maximální šířka pro tlačítko na velkých obrazovkách */
+    text-align: center;
+}
+
+.answer-button:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.answer-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.answer-button.correct {
+    background-color: #28a745; /* Zelená pro správnou odpověď */
+    border: 2px solid #218838;
+}
+
+.answer-button.wrong {
+    background-color: #dc3545; /* Červená pro špatnou odpověď */
+    border: 2px solid #c82333;
+}
+
+.feedback-message {
+    margin-top: 25px;
+    font-size: 1.3em;
+    font-weight: bold;
+    min-height: 2em; /* Aby se naskakováním textu nerozjížděl layout */
+}
+
+#next-button {
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 1.2em;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#next-button:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+#quiz-score {
+    margin-top: 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Styl pro tlačítko Zpět - stejný jako u puzzle */
+.back-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;
+    color: #4285f4;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    font-weight: bold;
+}
+
+.back-button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responzivní úpravy pro menší obrazovky (zde odstraněna grid definice) */
+/* Flexbox už se postará o zalomení automaticky */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header img {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .header h1 {
+        font-size: 1.5em;
+    }
+
+    .quiz-container {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .quiz-container h2 {
+        font-size: 1.5em;
+    }
+
+    .answer-button {
+        font-size: 1em;
+        padding: 12px 15px;
+        flex: 1 1 100%; /* Na malých obrazovkách se roztáhne na celou šířku */
+        max-width: none; /* Zruší max-width z větší obrazovky */
+    }
+
+    .feedback-message {
+        font-size: 1.1em;
+    }
+
+    #next-button {
+        padding: 10px 20px;
+        font-size: 1.1em;
+    }
+
+    #quiz-score {
+        font-size: 1.3em;
+    }
+
+    .back-button {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
