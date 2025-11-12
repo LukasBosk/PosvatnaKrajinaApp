@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kvíz - Archeologie</title>
+    <link rel="stylesheet" href="style-quiz.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <img src="./logo.png" alt="Logo">
+        <h1>Archeologický kvíz</h1>
+    </div>
+
+    <main class="quiz-container">
+        <h2 id="question-text"></h2>
+        <div class="image-container">
+            <img id="quiz-image" src="" alt="Otázka k obrázku">
+        </div>
+        <div id="answers-container" class="answers-grid">
+            </div>
+        <div id="feedback" class="feedback-message"></div>
+        <button id="next-button" class="hidden">Další otázka</button>
+        <div id="quiz-score" class="score-display hidden"></div>
+    </main>
+
+    <a href="index.html" class="back-button">ZPĚT</a>
+
+    <script src="script-quiz.js"></script>
+</body>
+</html>
