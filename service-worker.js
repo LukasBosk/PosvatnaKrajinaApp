@@ -1,4 +1,4 @@
-const CACHE_NAME = 'muzeum-boskovicka-cache-v103';
+const CACHE_NAME = 'muzeum-boskovicka-cache-v104';
 
 // Seznam souborů, které se mají při instalaci Service Workeru uložit do cache
 // DŮLEŽITÉ: Ujistěte se, že zde jsou uvedeny VŠECHNY soubory, které aplikace potřebuje k offline provozu,
@@ -58,17 +58,21 @@ const urlsToCache = [
   './images/puzzle19.jpg',
   './images/puzzle20.jpg',
   './images/puzzle21.jpg',
-  'images/Borotin4R.jpg',
-  'images/Borotin4R2.jpg',
-  'images/Michov10R.jpg',
-  'images/Michov10R2.jpg',
-  'images/Vanovice4R.jpg',
-  'images/Vanovice4R2.jpg',
-  'images/Vanovice6R.jpg',
-  'images/Vanovice6R2.jpg',
-  'images/VelkeOpatovice1R.jpg',
-  'images/VelkeOpatovice1R2.jpg',
+  './images/puzzle21.jpg',
+  './images/Borotin4R2.jpg',
+  './images/Michov10R.jpg',
+  './images/Michov10R2.jpg',
+  './images/Vanovice4R.jpg',
+  './images/Vanovice4R2.jpg',
+  './images/Vanovice6R.jpg',
+  './images/Vanovice6R2.jpg',
+  './images/VelkeOpatovice1R.jpg',
+  './images/VelkeOpatovice1R2.jpg',
   './depoty-body.png',
+  './images/hrobR.jpg',
+  './images/tkaniR.jpg',
+  './images/osada3R.jpg',
+  './images/OsadaR.jpg',
   './hradiste-body.png',
   './pohrebiste-body.png',
   './sidliste-body.png',
@@ -184,6 +188,7 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
 
 
 
